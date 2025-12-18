@@ -20,4 +20,5 @@ RUN pip3 install --no-cache-dir --upgrade pip && \
     pip3 install --no-cache-dir -r requirements.txt
 
 # EXECUTION
+RUN chmod +x /code/inference.sh
 CMD ["bash", "inference.sh"]

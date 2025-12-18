@@ -1,13 +1,14 @@
 
 import sys
 import os
+import argparse
+import json
+import logging
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.batch_solver import BatchSolver
-
-import logging
 
 # Configure Logging
 logging.basicConfig(
@@ -16,21 +17,38 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-def test_single_question():
+def load_question_by_id(qid, file_path):
+    """Load a specific question from a JSON file."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+        for item in data:
+            # Check for id or qid
+            item_id = item.get('id') or item.get('qid')
+            if str(item_id) == str(qid):
+                return item
+        return None
+    except FileNotFoundError:
+        logging.error(f"File not found: {file_path}")
+        return None
+    except Exception as e:
+        logging.error(f"Error loading file {file_path}: {e}")
+        return None
+
+def test_single_question(qid, file_path):
+    # Load Item
+    print(f"Loading question {qid} from {file_path}...")
+    item = load_question_by_id(qid, file_path)
+    
+    if not item:
+        print(f"Error: Question with ID '{qid}' not found in '{file_path}'.")
+        return
+
     solver = BatchSolver()
     
-    item = {
-       "qid": "test_0331",
-    "question": "Việc tăng giá xăng ảnh hưởng đến cầu du lịch Highland thông qua cơ chế nào trước?",
-    "choices": [
-      "Ảnh hưởng thay thế",
-      "Ảnh hưởng thu nhập",
-      "Cả hai đồng thời",
-      "Không thể xác định"
-    ]
-    }
-    
-    print("\n--- Testing Single Question ---")
+    print("\n--- Testing Question ---")
+    print(f"QID: {item.get('id') or item.get('qid')}")
     print(f"Question: {item['question']}")
     print(f"Choices: {item['choices']}")
     print("-" * 30)
@@ -42,10 +60,7 @@ def test_single_question():
     # 2. Process
     print(f"Using Model: vnptai_hackathon_small (Default) or Check routing...")
     
-    # Check if it was routed to Large (Context) - in this case it likely wont unless RAG adds context
-    use_large = prepared_item.get('use_large_model', False)
     model_name = 'vnptai_hackathon_small'
-    
     batch = [prepared_item]
     
     print(f"Invoking Model ({model_name})...")
@@ -77,4 +92,10 @@ def test_single_question():
             break
 
 if __name__ == "__main__":
-    test_single_question()
+    parser = argparse.ArgumentParser(description='Test Retrieval & Answer for a single unique question.')
+    parser.add_argument('--qid', type=str, required=True, help='The ID of the question to test (e.g., test_001)')
+    parser.add_argument('--file', type=str, default='public_test/test.json', help='Path to the JSON test file')
+    
+    args = parser.parse_args()
+    
+    test_single_question(args.qid, args.file)

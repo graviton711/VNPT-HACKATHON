@@ -1,0 +1,26 @@
+.git
+__pycache__
+output
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+.mypy_cache/
+local_models/
+# Keep data and db for the submission if we want to include pre-indexed data
+# If you want a small image and build indices inside, uncomment below:
+# # chroma_db/
+# bm25_index.db

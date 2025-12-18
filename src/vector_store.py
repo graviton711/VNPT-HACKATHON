@@ -1,3 +1,11 @@
+# FIX: Override sqlite3 for ChromaDB on old systems/Docker
+try:
+    __import__('pysqlite3')
+    import sys
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+except ImportError:
+    pass
+
 import os
 import uuid
 import hashlib
