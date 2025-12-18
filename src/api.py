@@ -3,6 +3,7 @@ import os
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .logger import setup_logger
+from .config import MAX_RETRIES
 
 logger = setup_logger(__name__)
 
@@ -51,7 +52,7 @@ class VNPTClient:
             'Content-Type': 'application/json'
         }
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_exponential(multiplier=1, min=4, max=10))
     def chat_completion(self, messages, model='vnptai_hackathon_small', temperature=0.1, max_tokens=512, top_p=1.0, top_k=50, n=1, response_format=None, logprobs=False, tools=None, tool_choice=None, seed=None):
         self.request_count += 1
         if 'small' in model:
@@ -101,7 +102,7 @@ class VNPTClient:
              
         return message
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_exponential(multiplier=1, min=4, max=10))
     def get_embedding(self, text):
         self.request_count += 1
         key_type = 'embedding'

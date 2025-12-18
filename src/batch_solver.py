@@ -414,9 +414,28 @@ class BatchSolver:
             all_results = updated_results
 
 
-        # 4. Save Output
+        # 4. Save Output (JSON)
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(all_results, f, ensure_ascii=False, indent=2)
+            
+        # 5. Save Output (CSV) - REQUIRED BY RULES
+        # Output columns: qid, answer
+        csv_path = output_path.replace('.json', '.csv')
+        import csv
+        try:
+            with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['qid', 'answer']) # Header
+                for item in all_results:
+                    # QID might be in 'id' or 'qid' or 'question_id'
+                    q_id = item.get('id') or item.get('qid')
+                    ans = item.get('answer', '')
+                    if q_id:
+                         writer.writerow([q_id, ans])
+            logger.info(f"Saved CSV submission to: {csv_path}")
+        except Exception as e:
+            logger.error(f"Failed to save CSV: {e}")
+
             
         # PRINT STATISTICS
         inf_req = self.client.get_request_count()
@@ -570,13 +589,16 @@ class BatchSolver:
         # 1. Load Cache
         cache_file = "domain_cache.json"
         cached_map = {}
-        if os.path.exists(cache_file):
-            try:
-                with open(cache_file, "r", encoding="utf-8") as f:
-                    cached_map = json.load(f)
-                logger.info(f"   [Classification] Loaded {len(cached_map)} cached domains from {cache_file}")
-            except Exception:
-                logger.warning("   [Classification] Could not read cache file.")
+        # DISABLE CACHE LOADING FOR SAFETY (Private test might reuse IDs with diff content)
+        # if os.path.exists(cache_file):
+        #     try:
+        #         with open(cache_file, "r", encoding="utf-8") as f:
+        #             cached_map = json.load(f)
+        #         logger.info(f"   [Classification] Loaded {len(cached_map)} cached domains from {cache_file}")
+        #     except Exception:
+        #         logger.warning("   [Classification] Could not read cache file.")
+        
+        logger.info("[Classification] Cache DISABLED to ensure fresh classification for Private Test.")
         
         items_to_classify = []
         bypass_map = {} # qid -> domain
