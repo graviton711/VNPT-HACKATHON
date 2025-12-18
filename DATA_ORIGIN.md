@@ -1,114 +1,95 @@
 # Nguồn gốc Dữ liệu và Bản quyền (Data Origin & Licensing)
 
-Tài liệu này mô tả chi tiết nguồn gốc của các tập dữ liệu được sử dụng trong dự án, đồng thời làm rõ tính hợp pháp và giấy phép sử dụng (Open Source / Public Domain) cho mục đích nghiên cứu và phát triển.
+Tài liệu này mô tả chi tiết nguồn gốc của các tập dữ liệu được sử dụng trong dự án. Thông tin nguồn gốc chi tiết (URL, metadata) được **lưu trữ trực tiếp trong từng bản ghi của các file JSON/JSONL**.
 
-## 1. Tổng hợp Dữ liệu Kiến thức & Học thuật (General Knowledge & Academic Data)
+## 1. Dữ liệu Kiến thức Bách khoa (Wikipedia)
+Các tập dữ liệu sau được trích xuất từ **Wikipedia Tiếng Việt (vi.wikipedia.org)**, tuân thủ giấy phép **CC BY-SA 4.0**:
 
-**Các tệp tin hiện có:**
+**Các tệp tin:**
 *   `academic_biology.jsonl`
 *   `academic_chemistry.jsonl`
 *   `academic_computer_science.jsonl`
 *   `academic_economics.jsonl`
-*   `academic_geography.jsonl`
+
 *   `academic_maths.jsonl`
 *   `academic_philosophy.jsonl`
 *   `academic_physics.jsonl`
-*   `culture_vietnam.jsonl`
-*   `economics_macro.json`
-*   `finance_general.jsonl`
-*   `general_characters.jsonl`
-*   `general_skills.jsonl`
-*   `general_special.jsonl`
-*   `history_hochiminh_bio.jsonl`
-*   `history_hochiminh_collected.json`
-*   `history_party.json`
+*   `medical_knowledge.jsonl` (Y học thường thức)
+*   `dialy_hsg.json` (Địa lý học sinh giỏi)
+*   `general_characters.jsonl` (Nhân vật)
+*   `general_skills.jsonl` (Kỹ năng)
+*   `general_special.jsonl` (Kiến thức chung)
+*   `dictionary_combined.jsonl` (Từ điển)
+*   `culture_vietnam.jsonl` (Văn hóa Việt Nam)
+*   `provinces_wiki_chunked.json` (Thông tin tỉnh thành)
+*   `history_hochiminh_bio.jsonl` (Tiểu sử Hồ Chí Minh - Wiki)
 *   `knowledge_wikipedia.jsonl`
-*   `medical_knowledge.jsonl`
+
+**Giấy phép:**
+- Creative Commons Attribution-ShareAlike 4.0 International.
+
+## 2. Dữ liệu Lịch sử & Tư tưởng (Sách & Giáo trình)
+
+**Các tệp tin:**
+*   `ban_an_che_do_thuc_dan_phap_chunked.json`
+    - **Nguồn:** `sachne.com`
+    - **Tác phẩm:** Bản án chế độ thực dân Pháp (Nguyễn Ái Quốc).
+*   `giao_trinh_hcm_structured.json`
+    - **Nguồn:** Giáo trình Bộ Giáo dục & Đào tạo (`sachne.com`).
+*   `gt_lich_su_dang_chunked.json`
+    - **Nguồn:** Giáo trình Lịch sử Đảng Cộng sản Việt Nam.
 *   `politics_ideology.jsonl`
+    - **Nguồn:** Tổng hợp từ các tài liệu chính trị, tư tưởng (đã ghi nguồn trong file).
 
-**Nguồn gốc Dữ liệu:**
-- **Wikipedia Tiếng Việt** (`vi.wikipedia.org`)
-- Dữ liệu được trích xuất và tổng hợp từ các bài viết công khai trên bách khoa toàn thư mở Wikipedia.
+## 3. Dữ liệu Văn bản Quy phạm Pháp luật (Legal Documents)
 
-**Giấy phép & Quyền sử dụng (Licensing):**
-- **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0):**
-    - Toàn bộ nội dung văn bản trên Wikipedia được phát hành dưới giấy phép này.
-    - **Quyền hạn:** Cho phép sao chép, phân phối, và sửa đổi nội dung, kể cả cho mục đích thương mại, miễn là tuân thủ các điều kiện ghi công (Attribution) và chia sẻ tương tự (ShareAlike).
-    - **Tuân thủ:** Dự án sử dụng dữ liệu này cho mục đích nghiên cứu và huấn luyện mô hình AI, tuân thủ yêu cầu ghi rõ nguồn gốc từ Wikipedia.
+Dữ liệu được thu thập từ **Cơ sở dữ liệu Quốc gia về Văn bản Pháp luật (`vbpl.vn`)** và **LuatVietnam (`luatvietnam.vn`)**.
 
-## 2. Dữ liệu Giáo trình Lịch sử Đảng (Party History Textbook)
+**Các tệp tin từ VBPL:**
+*   `codes_vbpl.json` (Bộ luật)
+*   `laws_vbpl_2015_2022.json`
+*   `laws_vbpl_2023_2025.json`
+*   `laws_vbpl_thong_tu.json`
+*   `resolutions_vbpl_2023_2025.json`
+*   `vbpl_cqbh_55.json`
+*   `mergers_2025.json`
+*   `mergers_2025_nghiquyet.json`
+
+**Các tệp tin từ LuatVietnam & Khác:**
+*   `decrees_corpus_cleaned.json` (Các Nghị định - Nguồn LuatVietnam/VBPL)
+*   `quyetdinh_corpus.json` (Quyết định)
+*   `dvc_procedures_full.json` (Thủ tục hành chính - `dichvucong.gov.vn`)
+
+## 4. Dữ liệu Văn hóa & Tôn giáo
+
 **Các tệp tin:**
-- `history_party_voer.json`
+*   `culture_chonthieng.json`
+    - **Nguồn:** `chonthieng.com` (Đã xác nhận quyền sử dụng phi thương mại).
+*   `phat_hoc_pho_thong.jsonl`
+    - **Nguồn:** Tài liệu Phật học phổ thông (Public Domain).
+*   `cadao_danca.json`
+    - **Nguồn:** *Đang cập nhật nguồn cụ thể*. (Nguồn văn học dân gian).
+*   `thanhngu.json`
+    - **Nguồn:** Tục ngữ, thành ngữ Việt Nam (Văn học dân gian).
 
-## 3. Dữ liệu Kinh tế học (Economics)
+## 5. Dữ liệu Sách Kinh tế & Kỹ thuật (Textbooks)
+
 **Các tệp tin:**
-- `economics_micro_voer.json` (Kinh tế vi mô, Quản trị chiến lược)
+*   `economics_micro_chunked.json` / `economics_macro_chunked.json`
+*   `macroeconomics.jsonl` / `microeconomics.jsonl`
+*   `finance_general.jsonl`
+*   `nguyenliketoan.json`
+*   `ky_thuat_do_luong_structured.json`
+    - **Nguồn:** `https://cuuduongthancong.com/` (Cửu Dương Thần Công).
 
-## 4. Dữ liệu Văn bản Quy phạm Pháp luật (Legal Documents)
+## 6. Sách Tham khảo Nước ngoài (Translated)
+
 **Các tệp tin:**
-- `laws_vbpl_2023_2025.json` (Luật 2023-2025)
-- `codes_vbpl.json` (Bộ luật - Toàn bộ)
-- `resolutions_vbpl_2023_2025.json` (Nghị quyết 2023-2025)
-- `decrees_vbpl_2023_2025.json` (Nghị định 2023-2025)
-
-**Nguồn gốc (chung cho mục 2, 3, 4):**
-- **Thư viện Học liệu Mở Việt Nam (VOER)** (`voer.edu.vn`) - *Cho mục 2 và 3*
-- **Cơ sở dữ liệu Quốc gia về Văn bản Pháp luật (VBPL)** (`vbpl.vn`) - *Cho mục 4*
-
-## 6. Dữ liệu Hồ Chí Minh & Đào tạo (Ho Chi Minh Ideology & Education)
-**Các tệp tin:**
-- `ban_an_che_do_thuc_dan_phap.json`
-- `giao_trinh_tu_tuong_ho_chi_minh.json`
-
-**Nguồn gốc & Bản quyền:**
-- **Bản án chế độ thực dân Pháp**:
-    - Tác giả: Nguyễn Ái Quốc.
-    - Nguồn tải: `sachne.com`.
-    - Minh chứng bản quyền: **Public Domain (Phạm vi công cộng)**. Tác phẩm xuất bản lần đầu năm 1925, đã hết thời hạn bảo hộ bản quyền.
-- **Giáo trình Tư tưởng Hồ Chí Minh**:
-    - Tác giả: Bộ Giáo dục và Đào tạo.
-    - Nguồn tải: `sachne.com`.
-    - Minh chứng bản quyền: Sử dụng cho mục đích giáo dục và nghiên cứu phi thương mại (Educational Use).
-
-**Giấy phép & Quyền sử dụng:**
-- **Creative Commons Attribution 3.0 (CC BY 3.0):**
-    - Nội dung trên VOER được phát hành dưới giấy phép này (trừ khi có ghi chú khác).
-    - **Quyền hạn:** Cho phép chia sẻ và chỉnh sửa miễn là ghi công tác giả.
-    - **Tuân thủ:** Đã ghi rõ nguồn gốc từ VOER và giữ nguyên thông tin bản quyền trong metadata.
-
-## 7. Dữ liệu Văn hóa - Chốn Thiêng (Spiritual Culture Data)
-**Các tệp tin:**
-- `culture_chonthieng.json`
-
-**Nguồn gốc & Bản quyền:**
-- **Nguồn dữ liệu**: Website Chốn Thiêng (chonthieng.com).
-- **Xác nhận quyền sử dụng**:
-    - **Trạng thái**: Đã được sự xác nhận và đồng ý từ Quản trị viên (Admin) website.
-    - **Phạm vi sử dụng**: Được phép sử dụng toàn bộ thông tin công khai để phục vụ cộng đồng và huấn luyện AI (phi thương mại).
-    - **Yêu cầu**: Trích dẫn nguồn (Attribution).
-- **Minh chứng**: [Confirmed Support Message](docs/licenses/chonthieng_permission.png) (Lưu trữ nội bộ).
-
-## 8. Dữ liệu Giáo trình Kinh tế Bổ sung (Supplementary Economics Textbooks)
-**Các tệp tin:**
-- `economics_micro.json` / `economics_micro_chunked.json` (Giáo trình Kinh tế Vi mô)
-- `economics_macro.json` / `economics_macro_chunked.json` (Giáo trình Kinh tế Vĩ mô)
-
-**Nguồn gốc & Bản quyền:**
-- **Nguồn tải**: `tailieuvui.com`.
-- **Mục đích sử dụng**: Sử dụng cho mục đích giáo dục, nghiên cứu phi thương mại (Educational/Fair Use).
-
-
-## 9. Dữ liệu Tỉnh thành Việt Nam (Vietnam Provinces)
-**Các tệp tin:**
-- `provinces_wiki.json` / `provinces_wiki_chunked.json`
-
-**Nguồn gốc & Bản quyền:**
-- **Wikipedia Tiếng Việt** (`vi.wikipedia.org`).
-- **Giấy phép**: CC BY-SA 4.0.
+*   `morton_extracted_chunks.json` / `morton_strucutred_translated.json` (Về lịch sử chính trị Mỹ)
+    - **Nguồn:** `https://zlib.pub/book/americas-three-regimes-a-new-political-history-6rg4jejc6e60` (Sách tham khảo).
+*   `stallings_translated.json` (Về hệ điều hành máy tính)
+    - **Nguồn:** `https://drive.google.com/file/d/0B5tR1YhNBlD2dlZXUGRBY1RYRTg/view?resourcekey=0-prIVHwW9nBabHi42-ma5Nw` (Sách dịch/tham khảo).
 
 ---
-**Tổng kết:**
-Dữ liệu trong thư mục `data/` được tổng hợp từ các nguồn uy tín và tuân thủ bản quyền: Wikipedia Tiếng Việt (CC BY-SA 4.0), VOER (CC BY 3.0), VBPL (Dữ liệu công), Sách Nè/Tài Liệu Vui (Educational Use), và Chốn Thiêng (Được cấp phép sử dụng phi thương mại). Tất cả đều đảm bảo tính pháp lý cho mục đích nghiên cứu và phát triển.
-
-
-Morton Keller: https://zlib.pub/download/americas-three-regimes-a-new-political-history-6rg4jejc6e60?hash=23ba14d8c54e16769ada7383798a1d44
+**Lưu ý:**
+Chi tiết về đường dẫn gốc (URL) và metadata của từng đoạn văn bản được lưu trữ trong trường `source`, `url`, hoặc `metadata` của từng đối tượng JSON trong các file dữ liệu.

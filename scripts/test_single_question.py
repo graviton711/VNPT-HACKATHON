@@ -20,13 +20,13 @@ def test_single_question():
     solver = BatchSolver()
     
     item = {
-      "qid": "test_0229",
-    "question": "Ưu điểm của cơ cấu chỉ thị từ điện là:",
+       "qid": "test_0249",
+    "question": "Máu di chuyển một chiều trong hệ mạch là do",
     "choices": [
-      "Ít bị ảnh hưởng của từ trường nhiễu bên ngoài",
-      "Độ chính xác cao, công suất tiêu thụ bé",
-      "Thang đo chia đều",
-      "Tất cả đều đúng"
+      "sức đẩy của tim, sự đàn hồi của thành động mạch, các van động mạch và tĩnh mạch",
+      "sức hút của tim, sự đàn hồi của tĩnh mạch và các van tĩnh mạch",
+      "tim co bóp, thành mạch đàn hồi và các van tim",
+      "sức đẩy và sức hút của tim, sự đàn hồi của thành mạch và các van"
     ]
     }
     

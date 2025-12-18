@@ -73,13 +73,11 @@ class BatchSolver:
         context_text = ""
         context_text = ""
         if context:
-            # Case 1: Reading Comprehension -> Use Small Model (Forced)
-            # RC questions have self-contained context, so external RAG is often unnecessary/distracting.
+            # Reading Comprehension: Force Small Model
             context_text = f"[Đoạn thông tin]\n{context}\n\n"
             item['use_large_model'] = False
         else:
             item['use_large_model'] = False
-            # Use lock if strictly necessary, but Chroma/Requests usually fine in threads if read-only
             if self.retriever:
                 try:
                     relevant_docs = self.retriever.search(q_text, k=5)
@@ -89,10 +87,10 @@ class BatchSolver:
                 except Exception as e:
                     logger.error(f"RAG Error {qid}: {e}")
         
-        # Save context to item for external access (Classification Prompt)
+        # Save context for classification
         item['context'] = context_text
 
-        # Construct a strict layout for the prompt to ensure model aligns answer with implicit ID.
+        # Construct prompt layout
         item_text = f"<question id='{qid}'>\n{context_text}{question_only}\n"
         if choices:
             item_text += "Choices:\n"

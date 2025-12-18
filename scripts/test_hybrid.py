@@ -11,7 +11,7 @@ def test():
     retriever = Retriever()
     
     # TEST: Standard Query
-    query = "Theo tư tưởng Chủ Tịch Hồ Chí Minh, con đường giải phóng dân tộc được lựa chọn như thế nào?"
+    query = "Theo phân loại của Morton Keller trong \"Ba chế độ của Mỹ,\" giai đoạn nào trong số các giai đoạn sau được đặc trưng bởi việc chính phủ trung ương có ít ảnh hưởng đến nền kinh tế và tập trung vào các đảng chính trị và tòa án?"
     for i_run in range(1):
         print(f"\n[RUN {i_run+1}] Query: '{query}'")
         print("-" * 40)

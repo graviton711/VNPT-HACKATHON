@@ -178,6 +178,7 @@ class Retriever:
             try:
                 # Embedding is sequential to queries anyway, but putting it here cleans up flow
                 t_emb_start = time.time()
+                logger.info(f"Retrieving Embeddings for query: {query[:50]}...") # Progress Log
                 emb_response = self.client.get_embedding(query)
                 logger.debug(f"Embedding API took: {time.time()-t_emb_start:.2f}s")
                 

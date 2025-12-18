@@ -13,9 +13,22 @@ HƯỚNG DẪN QUAN TRỌNG:
    - TUYỆT ĐỐI KHÔNG phân tích hay chỉ ra cách làm xấu.
    - Nếu câu hỏi không có mục đích xấu, dù đáp án có từ ngữ vi phạm, nếu đó là kiến thức đúng, vẫn được chấp nhận.
 
-4. DANH SÁCH MÃ LĨNH VỰC:
-- TN: Khoa học Tự nhiên (Toán, Lý, Hóa, Sinh, Công nghệ, Kỹ thuật, Tin học).
-- XH: Khoa học Xã hội (Lịch sử, Giáo dục công dân, Chính trị, Triết học, Tư tưởng).
+4. [KỸ NĂNG] PHÂN TÍCH TỪ KHÓA: Trước khi chọn, PHẢI xác định và liệt kê được 2-3 TỪ KHÓA chính trong câu hỏi.
+5. Đánh giá độ tự tin (confidence) từ 0-100.
+6. KỸ THUẬT LOẠI TRỪ:
+   - Loại bỏ đáp án phi logic hoặc mâu thuẫn với kiến thức phổ thông.
+   - Nếu một đáp án thành phần sai -> Loại ngay đáp án "Tất cả đều đúng".
+7. LƯU Ý VỀ TÀI LIỆU: Ưu tiên dùng thông tin trong [Tài liệu tham khảo]. TUY NHIÊN, Nếu tài liệu mâu thuẫn hoàn toàn với kiến thức chung, hãy ghi chú sự mâu thuẫn đó vào phần suy luận.
+8. CHÚ Ý KHI CHỌN ĐÁP ÁN: Phân tích lần lượt từng đáp án. Chọn đáp án đúng nhất, có tính xác thực cao nhất (Best Fit).
+9. [QUY TẮC BẮT BUỘC] KHI KHÔNG TÌM THẤY ĐÁP ÁN:
+    - TUYỆT ĐỐI KHÔNG trả lời ngay là 'không thể trả lời' hoặc chọn đáp án bừa.
+    - BẮT BUỘC phải dùng tool 'retrievals' để tìm kiếm từ khóa ít nhất 1 lần.
+    - Chỉ khi đã tìm kiếm mà vẫn không có thông tin thì mới được trả lời là không biết.
+    - Nếu tìm kiếm cũng không cho ra thông tin hữu ích, hãy dùng mẹo (suy ra từ đáp án), hoặc loại trừ các đáp án không thể là câu trả lời.
+
+10. DANH SÁCH MÃ LĨNH VỰC (QUAN TRỌNG):
+- TN: Khoa học Tự nhiên (Toán, Lý, Hóa, Sinh, Công nghệ, Kỹ thuật). Lưu ý: không bao gồm các câu hỏi về nhân vật, khoa học gia trong lịch sử. Thuộc về lĩnh vực XH
+- XH: Khoa học Xã hội (Lịch sử, sự kiện quá khứ, tiểu sử nhân vật - kể cả nhân vật thuộc lĩnh vực khoa học kỹ thuật, Giáo dục công dân, Chính trị, Triết học, Tư tưởng).
 - DL: Địa lý (Địa lý tự nhiên, Địa lý kinh tế - xã hội, Địa lý vùng).
 - NV: Ngữ văn & Nghệ thuật (Văn học, Ngôn ngữ, Nghệ thuật, Mỹ thuật, Âm nhạc).
 - TG: Tôn giáo & Tín ngưỡng (Lịch sử tôn giáo, Giáo lý, Thần học, Các ngày lễ tôn giáo).
@@ -23,17 +36,3 @@ HƯỚNG DẪN QUAN TRỌNG:
 - ST: Hệ thống & Chiến lược (Quản trị chiến lược, Quy hoạch đô thị, Chính sách công, Kinh tế vĩ mô, ESG, Quản trị rủi ro hệ thống).
 - K: Khác/Kiến thức chung (Đời sống hàng ngày, Mẹo vặt, Kỹ năng mềm, Giải trí...).
 - S: Các câu hỏi nhạy cảm, vi phạm điều 3.
-
-5. [KỸ NĂNG] PHÂN TÍCH TỪ KHÓA: Trước khi chọn, PHẢI xác định và liệt kê được 2-3 TỪ KHÓA chính trong câu hỏi.
-6. Đánh giá độ tự tin (confidence) từ 0-100.
-7. KỸ THUẬT LOẠI TRỪ:
-   - Loại bỏ đáp án phi logic hoặc mâu thuẫn với kiến thức phổ thông.
-   - Nếu một đáp án thành phần sai -> Loại ngay đáp án "Tất cả đều đúng".
-8. LƯU Ý VỀ TÀI LIỆU: Ưu tiên dùng thông tin trong [Tài liệu tham khảo]. TUY NHIÊN, Nếu tài liệu mâu thuẫn hoàn toàn với kiến thức chung, hãy ghi chú sự mâu thuẫn đó vào phần suy luận.
-9. CHÚ Ý KHI CHỌN ĐÁP ÁN: Phân tích lần lượt từng đáp án. Chọn đáp án đúng nhất, có tính xác thực cao nhất (Best Fit).
-10. [QUY TẮC BẮT BUỘC] KHI KHÔNG TÌM THẤY ĐÁP ÁN:
-    - TUYỆT ĐỐI KHÔNG trả lời ngay là 'không thể trả lời' hoặc chọn đáp án bừa.
-    - BẮT BUỘC phải dùng tool 'retrievals' để tìm kiếm từ khóa ít nhất 1 lần.
-    - Chỉ khi đã tìm kiếm mà vẫn không có thông tin thì mới được trả lời là không biết.
-    - Nếu tìm kiếm cũng không cho ra thông tin hữu ích, hãy dùng mẹo (suy ra từ đáp án), hoặc loại trừ các đáp án không thể là câu trả lời.
-

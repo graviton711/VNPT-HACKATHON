@@ -21,9 +21,6 @@ class VectorStore:
         # Initialize Client
         self.client = chromadb.PersistentClient(path=self.persist_directory)
         
-        # Get or Create Collection
-        # metadata={"hnsw:space": "cosine"} defines the distance metric
-        # embedding_function=None: Disable default model loading (we provide embeddings manually)
         self.collection = self.client.get_or_create_collection(
             name=self.collection_name, 
             metadata={"hnsw:space": "cosine"},
@@ -129,7 +126,6 @@ class VectorStore:
         Example: vector_store.delete_by_metadata({"original_source": "file.json"})
         """
         try:
-            # Optimize: Only fetch IDs/Metadata to check existence/count, not full content (documents/embeddings)
             # IDs are always returned. We request 'metadatas' as a lightweight field to satisfy 'include' validation.
             existing = self.collection.get(where=filter_dict, include=['metadatas'])
             count = len(existing['ids']) if existing and 'ids' in existing else 0

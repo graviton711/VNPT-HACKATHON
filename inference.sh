@@ -1,6 +1,13 @@
 #!/bin/bash
 
 # Run prediction
-# Assuming index is already built or pre-packaged. 
-# If index needs to be built at runtime from raw data, add: python indexer.py
+# Check if index exists, if not build it
+if [ ! -d "chroma_db" ]; then
+    echo "Index not found. Building index..."
+    python scripts/indexer.py
+else
+    echo "Index found. Skipping build."
+fi
+
+# Run prediction
 python predict.py
