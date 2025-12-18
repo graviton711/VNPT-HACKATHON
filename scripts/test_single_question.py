@@ -20,13 +20,13 @@ def test_single_question():
     solver = BatchSolver()
     
     item = {
-       "qid": "test_0249",
-    "question": "Máu di chuyển một chiều trong hệ mạch là do",
+       "qid": "test_0331",
+    "question": "Việc tăng giá xăng ảnh hưởng đến cầu du lịch Highland thông qua cơ chế nào trước?",
     "choices": [
-      "sức đẩy của tim, sự đàn hồi của thành động mạch, các van động mạch và tĩnh mạch",
-      "sức hút của tim, sự đàn hồi của tĩnh mạch và các van tĩnh mạch",
-      "tim co bóp, thành mạch đàn hồi và các van tim",
-      "sức đẩy và sức hút của tim, sự đàn hồi của thành mạch và các van"
+      "Ảnh hưởng thay thế",
+      "Ảnh hưởng thu nhập",
+      "Cả hai đồng thời",
+      "Không thể xác định"
     ]
     }
     

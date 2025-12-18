@@ -5,6 +5,8 @@ pandas==2.1.4
 tenacity==8.2.3
 rank_bm25==0.2.2
 scikit-learn
+chromadb==0.4.22
+pyvi
 sentence-transformers
 # Optional for local test
 llama-cpp-python

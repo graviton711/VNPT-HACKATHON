@@ -4,7 +4,7 @@
 # Check if index exists, if not build it
 if [ ! -d "chroma_db" ]; then
     echo "Index not found. Building index..."
-    python scripts/indexer.py
+    python src/indexer.py
 else
     echo "Index found. Skipping build."
 fi

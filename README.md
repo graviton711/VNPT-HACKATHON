@@ -1,4 +1,4 @@
-# VNPT AI Hackathon 2024 - RAG Pipeline (Track 2)
+# VNPT AI Hackathon 2025 - RAG Pipeline (Track 2)
 
 Hệ thống RAG (Retrieval-Augmented Generation) tiên tiến dành cho cuộc thi VNPT AI Hackathon, được thiết kế để giải quyết các câu hỏi đa lĩnh vực (Luật, Khoa học xã hội, Tự nhiên, Kinh tế) với độ chính xác cao dựa trên kỹ thuật Hybrid Search và suy luận logic.
 
@@ -8,10 +8,12 @@ Hệ thống hoạt động theo quy trình 3 bước (3-Stage Pipeline):
 
 ### Stage 1: Phân loại & Định tuyến (Router)
 - **Input:** Câu hỏi trắc nghiệm.
-- **Xử lý:** Sử dụng LLM để phân loại câu hỏi vào các domain (Luật, Kinh tế, Vĩ mô, Xã hội, Tự nhiên...).
+- **Xử lý:** Sử dụng **Large Model** để phân loại câu hỏi vào các domain.
+- **Tại sao dùng Large Model?** 
+    - Mặc dù khả năng suy luận sâu và context length hạn chế hơn Small Model, nhưng Large Model có độ nhạy rất tốt với các từ khóa ngắn gọn, phù hợp tối ưu cho tác vụ phân loại (Classification).
 - **Tác dụng:**
-    - Kích hoạt prompt chuyên biệt cho từng loại (Ví dụ: Prompt Luật ưu tiên trích dẫn điều khoản, Prompt Xã hội ưu tiên tư duy phạm trù).
-    - Giúp LLM áp dụng đúng "Tư duy giải quyết vấn đề" (Problem Solving Mindset) phù hợp với lĩnh vực.
+    - Kích hoạt prompt chuyên biệt cho từng loại.
+    - Giúp hệ thống "hiểu đề" trước khi giải.
 
 ### Stage 2: Truy xuất Thông tin Lai ghép (Hybrid Retrieval)
 Hệ thống sử dụng cơ chế tìm kiếm đa chiều để đảm bảo không bỏ sót thông tin:
@@ -90,6 +92,7 @@ Thay vì gọi LLM một lần duy nhất, Agent thực hiện 3 vòng lặp đ�
 
 1.  **Pass 1: Mass Inference (Suy luận Diện rộng)**
     *   Sử dụng **Small Model** để xử lý song song toàn bộ các câu hỏi.
+    *   **Tại sao dùng Small Model?** Với khả năng tuân thủ Prompt vượt trội và kỹ năng Chain-of-Thought (CoT) mạch lạc, Small Model là lựa chọn tối ưu cho việc giải quyết vấn đề logic so với Large Model.
     *   Chia nhỏ câu hỏi thành các Batch theo Domain để tận dụng Context Caching.
     *   Mục tiêu: Đạt tốc độ tối đa và độ phủ 80% câu hỏi dễ/trung bình.
 
