@@ -1,0 +1,10 @@
+requests==2.31.0
+tqdm==4.66.1
+numpy==1.26.3
+pandas==2.1.4
+tenacity==8.2.3
+rank_bm25==0.2.2
+scikit-learn
+sentence-transformers
+# Optional for local test
+llama-cpp-python

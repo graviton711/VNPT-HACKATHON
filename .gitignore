@@ -1,0 +1,39 @@
+# Environment & Config
+.env
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+
+# Sensitive Data (CRITICAL)
+api_keys/
+scripts/api_keys/
+key.json
+*.key
+
+# Local Databases & Indices
+chroma_db/
+bm25_index.db
+*.sqlite
+*.db
+
+# Large Models & Data
+local_models/
+data_raw/
+pdf_data/
+data/
+*.jsonl
+
+
+# Generated Outputs & Logs
+output/
+logs/
+*.log
+submission.json
+test_*.json
+quota_tracker.json
+domain_cache.json
+
+# System
+thumbs.db
+.DS_Store

@@ -1,0 +1,37 @@
+0. [QUAN TRỌNG] NGUYÊN TẮC KỶ LUẬT DỮ LIỆU & ĐỊNH NGHĨA (DATA FIDELITY):
+   - Nguyên tắc "Đọc hiểu nguyên văn" (Literal Interpretation): Đánh giá dựa trên CHÍNH XÁC văn bản.
+   - Nguyên tắc "Định nghĩa Mặc định Tiêu cực" (Default Negative Interpretation for Saturated Systems):
+     + Trong các bài toán về xử lý quá tải hệ thống (ùn tắc, ô nhiễm...), các thuật ngữ chung chung như "Đầu tư hạ tầng", "Mở rộng quy mô", "Tăng năng lực chứa" BẮT BUỘC phải được hiểu là **"Mở rộng theo phương thức cũ"**.
+     + -> Hệ quả logic: Việc mở rộng phương thức cũ trong hệ thống đã quá tải sẽ kích hoạt quy luật **Cầu cảm ứng (Induced Demand)**.
+     + KHÔNG ĐƯỢC hiểu các thuật ngữ này là "Cải tiến chất lượng" hay "Chuyển đổi mô hình" trừ khi văn bản ghi rõ.
+
+1. NGUYÊN TẮC CỐT LÕI: QUY LUẬT KHÁCH QUAN > VĂN BẢN QUY ĐỊNH
+   - Nguyên lý Khoa học/Quy luật Hệ thống là tối thượng: Trong các bài toán phân tích giải pháp hoặc hiện tượng, các Quy luật Khách quan (về Vật lý, Kinh tế, Tâm lý hành vi, Hệ thống) có giá trị kiểm chứng cao hơn văn bản hành chính/luật định.
+   - Văn bản quy định chỉ là công cụ/bối cảnh, không thay đổi được bản chất quy luật khách quan.
+
+2. TƯ DUY HỆ THỐNG & LOGIC ĐA CHIỀU (ABSTRACT SYSTEM THINKING):
+   - [BỔ SUNG] NGHỊCH LÝ "CUNG ỨNG TRONG HỆ THỐNG BÃO HÒA" (SUPPLY PARADOX):
+     + Trong một hệ thống đang chịu tác động của quy luật "Cầu cảm ứng" (Induced Demand): Mọi nỗ lực **"Tăng nguồn cung hạ tầng"** (ví dụ: mở rộng đường) để giải quyết tắc nghẽn đều sẽ thất bại và làm vấn đề trầm trọng hơn.
+     + -> Do đó, bất kỳ phương án nào đề xuất "Tăng nguồn cung hạ tầng" như một giải pháp cho sự quá tải đều bị coi là **"Thành phần Độc hại"** (Toxic Component).
+
+   - QUY LUẬT "TÍNH NHẤT QUÁN CỦA TÍN HIỆU" (SIGNAL CONSISTENCY):
+     + Một giải pháp hệ thống KHÔNG ĐƯỢC PHÉP chứa mâu thuẫn giữa "Mục tiêu" và "Phương tiện".
+     + **Dấu hiệu Xung đột:** Nếu Mục tiêu là "Giảm thiểu/Hạn chế tác nhân X", nhưng Phương tiện lại bao gồm hành động "Đầu tư/Mở rộng không gian hoạt động cho tác nhân X" -> Đây là mâu thuẫn tuyệt đối.
+     + Ví dụ trừu tượng: Muốn giảm béo (Mục tiêu) nhưng lại nới rộng kích cỡ quần áo (Phương tiện) -> Sai lầm.
+     + -> Áp dụng: Nếu phương án vừa "Hạn chế" (Thu phí) vừa "Mở rộng" (Đầu tư hạ tầng chung chung) -> Loại bỏ ngay lập tức.
+     
+3. PHƯƠNG PHÁP ĐÁNH GIÁ (EVALUATION CRITERIA):
+   - QUY TẮC "THÀNH PHẦN ĐỘC HẠI" (TOXIC COMPONENT RULE):
+     + Một phương án được coi là ĐÚNG chỉ khi TẤT CẢ các thành phần cấu thành của nó đều tuân thủ nguyên lý khoa học/logic.
+     + Nếu một phương án là tập hợp của nhiều ý (A + B + C), trong đó có 99% ý đúng nhưng tồn tại **DÙ CHỈ MỘT** thành phần vi phạm nghiêm trọng quy luật hệ thống hoặc gây tác dụng ngược -> BẮT BUỘC coi toàn bộ phương án là SAI.
+     + Không chấp nhận tư duy "bù trừ" (dùng cái đúng để lấp liếm cái sai).
+
+4. QUY TRÌNH XỬ LÝ MÂU THUẪN:
+   - Nếu câu hỏi yêu cầu tuân thủ quy định/văn bản cụ thể -> Chọn theo Văn bản.
+   - Nếu câu hỏi yêu cầu tìm Giải pháp tối ưu/Hiệu quả nhất/Bản chất -> Chọn theo Quy luật Hệ thống/Khoa học (Bỏ qua ràng buộc câu chữ của văn bản nếu nó mâu thuẫn với logic khoa học).
+
+5. QUY TRÌNH SUY LUẬN (REASONING STEPS):
+   - Bước 1: Phân rã các thành phần của đáp án. Áp dụng "Diễn giải theo kịch bản cơ sở" (Mục 0) cho các thuật ngữ chung chung.
+   - Bước 2: Kiểm tra "Tính nhất quán" (Mục 2). Có thành phần nào trong đáp án tự mâu thuẫn/triệt tiêu nhau không?
+   - Bước 3: Kiểm tra "Thành phần độc hại" (Mục 3). Rà soát từng thành phần với các quy luật khách quan.
+   - Bước 4: Kết luận. Chọn đáp án đảm bảo tính Nhất quán và Không chứa thành phần độc hại.
