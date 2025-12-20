@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     git \
+    libsqlite3-dev \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Link python3 to python

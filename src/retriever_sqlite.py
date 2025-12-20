@@ -26,7 +26,7 @@ class SQLiteBM25:
     def _get_conn(self):
         """Get thread-local connection."""
         if not hasattr(self.local, 'conn'):
-            self.local.conn = sqlite3.connect(self.db_path)
+            self.local.conn = sqlite3.connect(self.db_path, check_same_thread=False)
             # Enable WAL mode for better concurrency
             self.local.conn.execute("PRAGMA journal_mode=WAL")
         return self.local.conn

@@ -3,13 +3,12 @@ import json
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
-import math
 import os
 
 from .api import VNPTClient
 from .data import DataLoader
 from .retriever import Retriever
-from .utils import RateLimiter
+from .utils import RateLimiter, Executor
 from .domain_prompts import DOMAIN_MAPPING, CLASSIFICATION_PROMPT, PROMPT_GENERAL
 from .config import (
     MODEL_SMALL, MODEL_LARGE, BATCH_SIZE_SMALL, BATCH_SIZE_LARGE, 
@@ -123,12 +122,22 @@ class BatchSolver:
             
         logger.info(f"Processing {len(data)} questions...")
 
+        # 0. Preserve Original Order
+        for idx, item in enumerate(data):
+            item['_index'] = idx
+
         # 1. Parallel Preparation (RAG) & Classification
         # We run these concurrently to maximize throughput.
         logger.info("1. Preparing Data & Running RAG + Classification (Parallel)...")
         
         prepared_data = []
         domain_map = {}
+        
+        # ... (Preparation logic omitted for brevity, it's unchanged) ...
+        
+        # [Existing code for preparation would be here, but we are skipping to the save part]
+        # Wait, I need to target the SAVE block specifically.
+        # Let's do this in two chunks.
         
         with ThreadPoolExecutor(max_workers=MAX_WORKERS_RAG + 5) as executor: # +5 for classification threads
             # A. Submit RAG Preparation
@@ -225,8 +234,24 @@ class BatchSolver:
                     # Collect items that requested calculations for a second pass
                     global_pending_calc_items.extend(pending)
                 except Exception as e:
-                    m_type, _ = future_to_batch[future]
-                    logger.error(f"[{m_type}] Batch Error: {e}")
+                    m_type, failed_batch = future_to_batch[future]
+                    logger.error(f"[{m_type}] Batch FATAL Error: {e}")
+                    
+                    # FALLBACK: Fill missing items with Default 'A' to prevent submission gaps
+                    for fb_item in failed_batch:
+                         qid = fb_item.get('id') or fb_item.get('qid')
+                         all_results.append({
+                             "id": qid,
+                             "answer": "A",
+                             "confidence": 0,
+                             "reasoning": f"System Error Fallback: {str(e)}",
+                             "domain": fb_item.get('domain', 'K')
+                         })
+                    logger.warning(f"  [Fallback] Added {len(failed_batch)} default answers for failed batch.")
+
+                  # INCREMENTAL SAVE (CRITICAL)
+                if len(all_results) % 10 == 0: # Save every 10 items (or every batch)
+                    self._save_results(all_results, output_path)
 
         # 4. Consolidated Second Pass (Calculations)
         # Items that needed calculation (via tool call) are re-batched and processed.
@@ -263,11 +288,7 @@ class BatchSolver:
                         all_results.extend(res) 
                         
                         # INCREMENTAL SAVE
-                        try:
-                            with open(output_path, 'w', encoding='utf-8') as f:
-                                json.dump(all_results, f, ensure_ascii=False, indent=2)
-                        except Exception as save_err:
-                            logger.error(f"  [Save Error] Could not save incremental results: {save_err}")
+                        self._save_results(all_results, output_path)
                             
                     except Exception as e:
                         logger.error(f"Calc Batch Error: {e}")
@@ -346,10 +367,7 @@ class BatchSolver:
                         temp_map = {r['id']: r for r in all_results}
                         for lr in large_results:
                             temp_map[lr['id']] = lr 
-                        try:
-                            with open(output_path, 'w', encoding='utf-8') as f:
-                                json.dump(list(temp_map.values()), f, ensure_ascii=False, indent=2)
-                        except: pass 
+                        self._save_results(list(temp_map.values()), output_path)
                         
                      except Exception as e:
                          logger.error(f"Retry Batch Error: {e}")
@@ -386,11 +404,7 @@ class BatchSolver:
                             for lr in large_results:
                                 temp_map[lr['id']] = lr # Overwrite with newer result
                             
-                            try:
-                                with open(output_path, 'w', encoding='utf-8') as f:
-                                    json.dump(list(temp_map.values()), f, ensure_ascii=False, indent=2)
-                            except Exception as save_err:
-                                logger.error(f"  [Save Error] Retry Loop Incremental Save failed: {save_err}")
+                            self._save_results(list(temp_map.values()), output_path)
 
                         except Exception as e:
                             logger.error(f"Retry Calc Error: {e}")
@@ -414,27 +428,10 @@ class BatchSolver:
             all_results = updated_results
 
 
-        # 4. Save Output (JSON)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(all_results, f, ensure_ascii=False, indent=2)
-            
-        # 5. Save Output (CSV) - REQUIRED BY RULES
-        # Output columns: qid, answer
+        # 4. Save Output (JSON & CSV)
+        self._save_results(all_results, output_path)
         csv_path = output_path.replace('.json', '.csv')
-        import csv
-        try:
-            with open(csv_path, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                writer.writerow(['qid', 'answer']) # Header
-                for item in all_results:
-                    # QID might be in 'id' or 'qid' or 'question_id'
-                    q_id = item.get('id') or item.get('qid')
-                    ans = item.get('answer', '')
-                    if q_id:
-                         writer.writerow([q_id, ans])
-            logger.info(f"Saved CSV submission to: {csv_path}")
-        except Exception as e:
-            logger.error(f"Failed to save CSV: {e}")
+        logger.info(f"Saved submission to: {output_path} and {csv_path}")
 
             
         # PRINT STATISTICS
@@ -443,6 +440,48 @@ class BatchSolver:
         total_req = inf_req + rag_req
         logger.info(f"\n[Statistics]\n- Inference Requests: {inf_req}\n- Embedding Requests: {rag_req}\n- Total Requests: {total_req}")
 
+
+    def _save_results(self, all_results: list, output_path: str):
+        """Helper to save results in JSON and CSV formats, ensuring order."""
+        try:
+            # Sort by original index to ensure "top-to-bottom" order
+            sorted_results = sorted(all_results, key=lambda x: x.get('_index', 999999))
+            
+            # 1. Save JSON
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(sorted_results, f, ensure_ascii=False, indent=2)
+
+            # 2. Save Standard CSV (qid, answer)
+            import csv
+            csv_path = output_path.replace('.json', '.csv')
+            with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['qid', 'answer'])
+                for item in sorted_results:
+                    q_id = item.get('id') or item.get('qid')
+                    ans = item.get('answer', '')
+                    if q_id:
+                        writer.writerow([q_id, ans])
+
+            # 3. Save Time CSV (qid, answer, time)
+            time_csv_path = output_path.replace('submission.json', 'submission_time.csv')
+            if 'submission' not in time_csv_path:
+                 time_csv_path = output_path.replace('.json', '_time.csv')
+
+            with open(time_csv_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                # writer.writerow(['qid', 'answer', 'time']) # Header optional? Guidelines say YES.
+                # Re-reading guidelines: "qid,answer,time"
+                writer.writerow(['qid', 'answer', 'time'])
+                for item in sorted_results:
+                    q_id = item.get('id') or item.get('qid')
+                    ans = item.get('answer', '')
+                    t_infer = item.get('time', 0.0)
+                    if q_id:
+                        writer.writerow([q_id, ans, f"{t_infer:.4f}"])
+                        
+        except Exception as e:
+            logger.error(f"  [Save Helper Error]: {e}")
 
     def _classify_batch_domains(self, batch: list) -> dict:
         """
@@ -676,6 +715,9 @@ class BatchSolver:
         Returns:
             tuple: (final_results, final_pending_items)
         """
+        import time
+        t_start = time.time()
+        
         # 1. Classify
         items_to_classify = []
         bypass_map = {} # qid -> domain
@@ -730,6 +772,16 @@ class BatchSolver:
             final_results.extend(res)
             final_pending_items.extend(pending)
                 
+        
+        # [TIMING] Record End Time and Assign to Items
+        t_end = time.time()
+        duration = t_end - t_start
+        # Amortize time across batch (If batch=1, it's exact)
+        avg_time = duration / max(len(final_results), 1) 
+        
+        for item in final_results:
+            item['time'] = avg_time
+
         return final_results, final_pending_items
 
     def _solve_sub_batch(self, batch: list, model_name: str, system_prompt_intro: str, retry_count: int = 0) -> tuple:
@@ -766,17 +818,18 @@ class BatchSolver:
                     "required": ["id", "answer", "confidence"]
                 }
             },
-            "computations": {
+
+            "execute_python": {
                 "type": "array",
                 "items": {
                     "type": "object",
                     "properties": {
                         "id": {"type": "string"},
-                        "expression": {"type": "string", "description": "Biểu thức toán học (VD: 12 + 45 * 2)"}
+                        "code": {"type": "string", "description": "Code Python để giải bài toán. Bắt buộc phải dùng print() để in kết quả."}
                     },
-                    "required": ["id", "expression"]
+                    "required": ["id", "code"]
                 },
-                "description": "Dùng cái này nếu cần tính toán giá trị TRƯỚC khi trả lời."
+                "description": "Dùng cái này để viết code xử lý phức tạp (Logic, thuật toán, xử lý chuỗi...)"
             }
         }
 
@@ -887,7 +940,7 @@ class BatchSolver:
                                 args = json.loads(tc['function']['arguments'])
                                 # 1. Collect Direct Answers & Apply Safety Logic
                                 raw_answers = args.get('answers', [])
-                                raw_computations = args.get('computations', [])
+                                # raw_computations removed
                                 raw_retrievals = args.get('retrievals', [])
                             except json.JSONDecodeError as je:
                                  logger.error(f"  [Error] JSON Decode Error in batch (Attempt {attempt+1}): {je}. Attempting Partial Recovery...")
@@ -895,16 +948,18 @@ class BatchSolver:
                                  # ATTEMPT RECOVERY via Regex
                                  raw_text = tc['function']['arguments']
                                  raw_answers = parse_partial_json(raw_text)
-                                 raw_computations = parse_partial_computations(raw_text)
+                                 # raw_computations removed
                                  raw_retrievals = parse_partial_retrievals(raw_text)
-                                 
-                                 if raw_answers or raw_computations or raw_retrievals:
-                                     logger.info(f"  [Recovery] Salvaged {len(raw_answers)} answers, {len(raw_computations)} calcs, {len(raw_retrievals)} retrievals.")
+                                 # TODO: Add regex parsing for execute_python if needed
+                                 raw_python_codes = []
+                                     
+                                 if raw_answers or raw_retrievals:
+                                     logger.info(f"  [Recovery] Salvaged {len(raw_answers)} answers, {len(raw_retrievals)} retrievals.")
                                      # Proceed with these recovered items
                                      args = {
                                          "answers": raw_answers,
-                                         "computations": raw_computations,
-                                         "retrievals": raw_retrievals
+                                         "retrievals": raw_retrievals,
+                                         "execute_python": raw_python_codes
                                      } 
                                  else:
                                      logger.error(f"  [Recovery Failed] Could not extract any valid items.")
@@ -946,27 +1001,32 @@ class BatchSolver:
                                                 
                                 final_answers.append(ans_obj)
                             
-                            # 2. Handle Computations & Retrievals
-                            comps = args.get('computations', [])
+                            # 2. Handle Computations (REMOVED) & Retrievals
+                            # comps removed
                             rets = args.get('retrievals', [])
-                            
-                            # Handle Computations
-                            if comps and retry_count < 2: 
-                                logger.info(f"  [Batch] Handling {len(comps)} computations...")
-                                for c in comps:
-                                    qid = c.get('id')
-                                    expr = c.get('expression')
-                                    try:
-                                        allowed = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
-                                        val = str(eval(expr, {"__builtins__": {}}, allowed))
-                                    except Exception as e:
-                                        val = f"Error: {e}"
+
+
+                            # Handle Python Code Execution
+                            py_codes = args.get('execute_python', [])
+                            if py_codes and retry_count < 2:
+                                logger.info(f"  [Batch] Handling {len(py_codes)} python execution requests...")
+                                for pc in py_codes:
+                                    qid = pc.get('id')
+                                    code = pc.get('code')
+                                    
+                                    # Execute Code using safe subprocess
+                                    output = Executor.execute(code, timeout=5)
                                     
                                     if qid in item_map:
                                         item = item_map[qid]
-                                        # Add result to the item text for the next pass
-                                        item['_formatted_text'] += f"\n[HỆ THỐNG]: Kết quả tính toán '{expr}' = {val}\n"
-                                        pending_items.append(item)
+                                        # Add result to context
+                                        block = f"\n[HỆ THỐNG EXECUTION]:\nCode:\n{code}\nOutput:\n{output}\n"
+                                        # Deduplicate pending items
+                                        if item not in pending_items:
+                                            item['_formatted_text'] += block
+                                            pending_items.append(item)
+                                        else:
+                                            item['_formatted_text'] += block
 
                             # Handle Retrievals
                             if rets and retry_count < 2:

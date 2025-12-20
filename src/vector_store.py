@@ -76,13 +76,26 @@ class VectorStore:
         final_embeddings = [embeddings[i] for i in unique_indices]
         final_metadatas = [metadatas[i] for i in unique_indices]
 
+        # Chunking for DB limit (Safely below 5461)
+        DB_BATCH_SIZE = 5000
+        total_upserted = 0
+        
         try:
-            self.collection.upsert(
-                embeddings=final_embeddings,
-                documents=final_texts,
-                metadatas=final_metadatas,
-                ids=final_ids
-            )
+            for i in range(0, len(final_ids), DB_BATCH_SIZE):
+                upto = i + DB_BATCH_SIZE
+                batch_ids = final_ids[i:upto]
+                batch_texts = final_texts[i:upto]
+                batch_embs = final_embeddings[i:upto]
+                batch_metas = final_metadatas[i:upto]
+                
+                self.collection.upsert(
+                    embeddings=batch_embs,
+                    documents=batch_texts,
+                    metadatas=batch_metas,
+                    ids=batch_ids
+                )
+                total_upserted += len(batch_ids)
+                
         except Exception as e:
             print(f"[VectorStore] Error adding batch: {e}")
 

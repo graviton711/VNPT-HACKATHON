@@ -40,6 +40,9 @@ Các tập dữ liệu sau được trích xuất từ **Wikipedia Tiếng Việ
     - **Nguồn:** Giáo trình Lịch sử Đảng Cộng sản Việt Nam.
 *   `politics_ideology.jsonl`
     - **Nguồn:** Tổng hợp từ các tài liệu chính trị, tư tưởng (đã ghi nguồn trong file).
+*   `history_vietnam_complete.json` (Lịch sử Việt Nam 15 tập)
+    - **Nguồn:** `web dantocking`.
+    - **Link:** `https://drive.google.com/drive/u/0/folders/1DWoQ8tpQi68sbFJkB4Ppl5c6LL7ds_yF`
 
 ## 3. Dữ liệu Văn bản Quy phạm Pháp luật (Legal Documents)
 

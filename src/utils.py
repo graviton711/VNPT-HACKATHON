@@ -4,6 +4,48 @@ import os
 import time
 import datetime
 import threading
+import subprocess
+import sys
+
+class Executor:
+    """
+    Executes Python code in a safe subprocess environment.
+    """
+    @staticmethod
+    def execute(code: str, timeout: int = 5) -> str:
+        """
+        Executes the provided Python code and returns the stdout.
+        
+        Args:
+            code (str): The Python code to execute.
+            timeout (int): Timeout in seconds.
+
+        Returns:
+            str: Using stdout or error message.
+        """
+        try:
+            # Create a separate process to run the code
+            # "python -c <code>"
+            result = subprocess.run(
+                [sys.executable, "-c", code], 
+                capture_output=True, 
+                text=True, 
+                timeout=timeout,
+                encoding='utf-8' # Ensure utf-8 for Vietnamese
+            )
+            
+            if result.returncode == 0:
+                output = result.stdout.strip()
+                if not output:
+                    return "Code executed successfully but printed nothing."
+                return output
+            else:
+                return f"Error: {result.stderr.strip()}"
+                
+        except subprocess.TimeoutExpired:
+            return "Error: Execution timed out (limit: 5s)."
+        except Exception as e:
+            return f"System Error: {str(e)}"
 
 class QuotaTracker:
     def __init__(self, state_file="quota_tracker.json"):

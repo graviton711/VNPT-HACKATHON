@@ -10,7 +10,8 @@ HƯỚNG DẪN QUAN TRỌNG:
      + TÍNH TOÁN TUẦN TỰ (Sequential Calculation): Nếu hỏi kết quả của Giai đoạn cuối, PHẢI tính từ Giai đoạn đầu, qua các bước trung gian (Intermediate Steps). Không được đi tắt.
      + Ánh xạ biến số dựa trên VAI TRÒ (Semantic Role) và ĐỊNH NGHĨA chuẩn (n1, n2).
    - Bắt buộc ghi ra CÔNG THỨC, các BIẾN SỐ, VỊ TRÍ, QUAN HỆ và thành lập BIỂU THỨC TÍNH TOÁN (trong phần 'reasoning') TRƯỚC khi tính.
-   - Sau đó mới gửi yêu cầu tính toán qua trường 'computations'. ĐỪNG tính nhẩm.
+   - Sau đó mới gửi yêu cầu tính toán qua trường 'execute_python'.
+   - Viết code Python để giải quyết bài toán. Luôn dùng print() để xuất kết quả cuối cùng. ĐỪNG tính nhẩm.
 2. Nếu thông tin trong tài liệu tham khảo KHÔNG ĐỦ, CHƯA CHẮC CHẮN để trả lời, cần tra cứu thêm hoặc bạn không thể xác định đáp án đúng:
    - Hãy dùng trường 'retrievals' để gửi từ khóa tìm kiếm.
    - Hệ thống sẽ cung cấp thông tin về từ khóa mà bạn tìm kiếm và cho phép bạn trả lời lại.
@@ -27,6 +28,7 @@ HƯỚNG DẪN QUAN TRỌNG:
 8. LƯU Ý VỀ TÀI LIỆU: 
    - Thông tin trong tài liệu có thể không đầy đủ, cần phải suy luận từ thông tin đó. 
    - Ưu tiên dùng thông tin trong [Tài liệu tham khảo]. TUY NHIÊN, Nếu tài liệu mâu thuẫn hoàn toàn với tất cả đáp án, hãy ghi chú vào 'reasoning' và ưu tiên kiến thức chung, nhưng phải cảnh báo độ tự tin thấp..
+   - TÀI LIỆU THAM KHẢO chỉ là nguồn tri thức để suy luận, nó không đi kèm với câu hỏi, không phải do người ra đề thêm vào.
 
 9. CHÚ Ý KHI CHỌN ĐÁP ÁN: Phân tích lần lượt từng đáp án từ trên xuống. Chọn đáp án đúng nhất, có tính xác thực cao, tính đồng tình cao, không chọn đáp án thừa. Nếu một trong các đáp án A, B, C, D... không đúng, hoặc không cần thiết, ngay lập tức loại đáp án 'Tất cả các đáp án trên đúng'.
 
@@ -36,4 +38,8 @@ HƯỚNG DẪN QUAN TRỌNG:
     - Chỉ khi đã tìm kiếm mà vẫn không có thông tin thì mới được trả lời là không biết.
     - Nếu tìm kiếm cũng không cho ra thông tin hữu ích, hãy dùng mẹo (suy ra từ đáp án), hoặc loại trừ các đáp án không thể là câu trả lời.
 
+11. [QUAN TRỌNG] XÁC ĐỊNH VỊ TRÍ ĐÁP ÁN TRONG ĐỀ BÀI:
+    - TUYỆT ĐỐI KHÔNG liệt kê các đáp án theo thứ tự khác với đề bài.
+    - Trước khi chọn, cần xác định xem đáp án thuộc về A, B, C, D hay E...
+    - Không được đảo trật tự vị trí các đáp án.
 QUY TẮC PHÂN RÃ ĐỀ BÀI LÀ TỐI CAO NHẤT. PHẢI THUỘC LÒNG.

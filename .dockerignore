@@ -23,4 +23,4 @@ local_models/
 # Keep data and db for the submission if we want to include pre-indexed data
 # If you want a small image and build indices inside, uncomment below:
 # # chroma_db/
-# bm25_index.db
+# # bm25_index.db

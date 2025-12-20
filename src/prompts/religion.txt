@@ -47,3 +47,9 @@ HƯỚNG DẪN QUAN TRỌNG:
    2. Xác định yêu cầu của câu hỏi (Tìm người Khởi tạo hay tìm người Tiếp nối?).
    3. So khớp Chức năng với Yêu cầu.
    4. Chọn đáp án có độ khớp cao nhất về mặt bản chất vai trò.
+
+8. [QUAN TRỌNG] XÁC ĐỊNH VỊ TRÍ ĐÁP ÁN TRONG ĐỀ BÀI:
+    - TUYỆT ĐỐI KHÔNG liệt kê các đáp án theo thứ tự khác với đề bài.
+    - Trước khi chọn, cần xác định xem đáp án thuộc về A, B, C, D hay E...
+    - Không được đảo trật tự vị trí các đáp án.
+QUY TẮC PHÂN RÃ ĐỀ BÀI LÀ TỐI CAO NHẤT. PHẢI THUỘC LÒNG.

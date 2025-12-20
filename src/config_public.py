@@ -39,9 +39,9 @@ RRF_K = 50
 RERANK_POOL_SIZE = 20     # Reduced to 10 to speed up Reranking (GPU bound)
 
 # Concurrency & Batching Limits
-MAX_WORKERS_RAG = 8    # Reduced to 10 to prevent ConnectionResetError (Burst Protection)
-MAX_WORKERS_INFERENCE = 8  # Parallel threads for Model Inference (First Pass)
-MAX_WORKERS_CALC = 8     # Parallel threads for Calculation Pass & Retry Pass
+MAX_WORKERS_RAG = 4    # Reduced to fit Total 8
+MAX_WORKERS_INFERENCE = 4  # Reduced to fit Total 8
+MAX_WORKERS_CALC = 8     # Sequential pass can use full 8
 RETRY_BATCH_TOKENS = 18000  # Max tokens per batch for retry loops
 
 # GPU Safety

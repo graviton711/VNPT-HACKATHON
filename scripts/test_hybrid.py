@@ -11,7 +11,7 @@ def test():
     retriever = Retriever()
     
     # TEST: Standard Query
-    query = "Theo phân loại của Morton Keller trong \"Ba chế độ của Mỹ,\" giai đoạn nào trong số các giai đoạn sau được đặc trưng bởi việc chính phủ trung ương có ít ảnh hưởng đến nền kinh tế và tập trung vào các đảng chính trị và tòa án?"
+    query = "Theo quy trình cấp Chứng nhận trường mầm non đạt kiểm định chất lượng giáo dục, thành phần hồ sơ bắt buộc gồm những tài liệu nào?"
     for i_run in range(1):
         print(f"\n[RUN {i_run+1}] Query: '{query}'")
         print("-" * 40)
@@ -33,7 +33,7 @@ def test():
         
         for i, res in enumerate(results):
             print(f"[{i+1}] RRF: {res.get('rrf_score'):.4f} | Final: {res.get('rerank_score', 0):.4f}")
-            print(f"Content: {res['text'][:1024]}...") # Show more content
+            print(f"Content: {res['text'][:2048]}...") # Show more content
 
 if __name__ == "__main__":
     test()

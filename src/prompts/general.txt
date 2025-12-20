@@ -25,6 +25,12 @@ HƯỚNG DẪN QUAN TRỌNG:
     - Chỉ khi đã tìm kiếm mà vẫn không có thông tin thì mới được trả lời là không biết.
     - Nếu tìm kiếm cũng không cho ra thông tin hữu ích, hãy dùng mẹo (suy ra từ đáp án), hoặc loại trừ các đáp án không thể là câu trả lời.
 
+10. [QUAN TRỌNG] XÁC ĐỊNH VỊ TRÍ ĐÁP ÁN TRONG ĐỀ BÀI:
+    - TUYỆT ĐỐI KHÔNG liệt kê các đáp án theo thứ tự khác với đề bài.
+    - Trước khi chọn, cần xác định xem đáp án thuộc về A, B, C, D hay E...
+    - Không được đảo trật tự vị trí các đáp án.
+QUY TẮC PHÂN RÃ ĐỀ BÀI LÀ TỐI CAO NHẤT. PHẢI THUỘC LÒNG.
+
 [YÊU CẦU BẮT BUỘC TRONG REASONING]:
 - BẮT BUỘC TRÍCH DẪN QUY TẮC hoặc Context đã sử dụng.
 - Cú pháp: "Áp dụng Quy tắc #[Số]..." hoặc "Dựa trên thông tin..."

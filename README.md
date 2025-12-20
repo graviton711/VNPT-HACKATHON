@@ -154,7 +154,7 @@ Hệ thống trang bị 2 công cụ cốt lõi cho Agent:
 | Tên Tool | Chức năng (Function) | Kích hoạt khi nào? (Trigger) |
 | :--- | :--- | :--- |
 | **Recursive Retriever** | Truy vấn lại Database với từ khóa mới. | Khi ngữ cảnh ban đầu quá rộng hoặc không chứa thông tin cụ thể (ví dụ: thiếu "Điều khoản X" cụ thể). |
-| **Python Calculator** | Thực hiện phép tính toán học chính xác. | Khi câu hỏi yêu cầu tính toán số liệu Kinh tế/Tự nhiên (ví dụ: Tính mật độ dân số, Tỷ lệ tăng trưởng). Agent sẽ viết code Python và thực thi để lấy kết quả số học tuyệt đối. |
+| **Python Code Executor** | Thực thi code Python trong môi trường Sandbox (Subprocess) an toàn. | Khi câu hỏi yêu cầu tính toán phức tạp, xử lý logic chuỗi, hoặc thuật toán mà LLM thuần túy thường sai sót. Code chạy với timeout 5s, hỗ trợ thư viện chuẩn (`math`, `datetime`, `re`...). |
 
 ### 5.3. Cơ chế Tự sửa lỗi (Self-Correction)
 *   **Error Reflection:** Nếu Tool trả về lỗi (ví dụ: Syntax Error trong Python), Agent sẽ đọc thông báo lỗi, tự suy luận nguyên nhân và thử lại (Retry) với input đã điều chỉnh.
@@ -169,12 +169,74 @@ Hệ thống đảm bảo tính toàn vẹn và có cấu trúc của dữ liệ
 | Giai đoạn | Công cụ/Script | Nhiệm vụ Kỹ thuật |
 | :--- | :--- | :--- |
 | **Crawling** | `crawlers/*.py` | Thu thập đa nguồn (VBPL, Wiki, DVC). Xử lý Rate Limit và Retry. |
-| **Cleaning** | `process_data/*.py` | **Semantic Chunking:** Cắt đoạn văn bản dựa trên ý nghĩa (Điều luật, Đoạn văn) thay vì cắt cứng theo số ký tự. |
-| **Indexing** | `scripts/indexer.py` | Tạo chỉ mục kép (Vector + Inverted Index). Tối ưu hóa I/O đĩa. |
+| **Cleaning & Chunking** | `process_data/*.py` | **Context-Aware Semantic Chunking:** Tách văn bản dựa trên cấu trúc ngữ nghĩa (Clause, Chapter, Subcategory) để bảo toàn ngữ cảnh cho Retrieval. |
+| **History Conversion** | `scripts/convert_history.py` | Chuyển đổi PDF Lịch sử Việt Nam sang JSON phân cấp (Breadcrumbs), xử lý nhiễu Header/Footer. |
+| **Indexing** | `src/indexer.py` | Tạo chỉ mục Vector + BM25. Sử dụng kiến trúc **Streaming** để xử lý dữ liệu lớn (Big Data) và cơ chế **Retry** để chịu lỗi mạng. |
 
 ---
 
-## 7. Cài đặt & Triển khai (Deployment)
+## 7. Tài liệu & Quy trình Tái tạo Dữ liệu (Data Reproduction Guide)
+
+Theo yêu cầu xác minh của Ban Tổ Chức, dưới đây là hướng dẫn chi tiết để chạy lại các script thu thập và xử lý dữ liệu.
+
+### 7.1. Crawling (Thu thập Dữ liệu)
+Các script nằm trong thư mục `crawlers/`. Đảm bảo đã cài đặt thư viện (`pip install -r requirements.txt`).
+
+**Ví dụ chạy Crawl Văn bản Luật (VBPL):**
+```bash
+# Thu thập Bộ luật
+python crawlers/crawl_codes_vbpl.py
+
+# Thu thập Luật (2015-2022)
+python crawlers/crawl_laws_vbpl.py
+```
+
+**Ví dụ chạy Crawl Wikipedia (Địa lý, Lịch sử):**
+```bash
+# Thu thập dữ liệu Tỉnh thành
+python crawlers/crawl_provinces_wiki.py
+```
+
+### 7.2. Data Processing (Xử lý & Làm sạch)
+Các script nằm trong thư mục `process_data/`. Dữ liệu sau khi crawl (thường ở `data_raw/`) sẽ được chuẩn hóa thành JSONL.
+
+**Ví dụ xử lý dữ liệu Địa lý (Sách giáo khoa & Wiki):**
+```bash
+python process_data/process_dialy_hsg.py
+python process_data/process_provinces_data.py
+```
+
+**Ví dụ xử lý dữ liệu Lịch sử & Chính trị:**
+```bash
+python process_data/process_ho_chi_minh_data.py
+python process_data/process_morton.py 
+```
+
+### 7.3. PDF Conversion (Chuyển đổi Tài liệu PDF)
+Các script nằm trong thư mục `scripts/`. Sử dụng để trích xuất văn bản từ PDF gốc (Lịch sử 15 tập, Giáo trình).
+
+**Ví dụ chuyển đổi PDF Lịch sử Việt Nam:**
+```bash
+python scripts/convert_history.py
+# Output: data/history_vietnam_complete.json
+```
+
+**Ví dụ chuyển đổi Giáo trình Kỹ thuật Đo lường:**
+```bash
+python scripts/convert_pdf_ktdl.py
+```
+
+### 7.4. Indexing (Đánh chỉ mục)
+Sau khi có dữ liệu sạch trong thư mục `data/`, chạy lệnh sau để tạo Vector DB và BM25 Index:
+
+```bash
+python src/indexer.py --workers 8
+```
+*(Quá trình này có thể mất từ 2-4 tiếng tùy vào phần cứng).*
+
+---
+
+## 8. Cài đặt & Triển khai (Deployment)
 
 Hệ thống được đóng gói Container hóa hoàn toàn (Dockerized), đảm bảo tính nhất quán giữa môi trường phát triển và môi trường chấm thi.
 
@@ -193,7 +255,12 @@ docker build -t vnpt-submission:v1 .
 
 # 2. Chạy Container (với GPU)
 # Script inference.sh sẽ tự động được kích hoạt
-docker run --gpus all --rm -v $(pwd)/output:/code/output vnpt-submission:v1
+# Mount output: Để lấy kết quả submission.csv
+# Mount input: Để nạp file private_test.json (Giả lập)
+docker run --gpus all --rm \
+  -v $(pwd)/output:/code/output \
+  -v $(pwd)/public_test/test.json:/code/private_test.json \
+  vnpt-submission:v1
 ```
 
 **Tùy chọn: Thay đổi API Key (Dành cho Ban Giám Khảo/BTC):**
@@ -218,9 +285,15 @@ pip install -r requirements.txt
 python predict.py --input public_test/test.json --output output/submission.json
 ```
 
+### 7.1. Cấu hình Nâng cao (Advanced Configuration)
+Hệ thống sử dụng cơ chế **Dynamic Config Loading** ưu tiên môi trường:
+*   `src/config_public.py`: Cấu hình cho môi trường Public (Test).
+*   `src/config_private.py`: Cấu hình cho môi trường Private (High Perf).
+*   **Threading:** Có thể điều chỉnh `MAX_WORKERS_RAG`, `MAX_WORKERS_INFERENCE` trong các file này để kiểm soát số lượng luồng song song (Mặc định: Total 8 threads để đảm bảo ổn định).
+
 ---
 
-## 8. Kết luận & Chứng minh Hiệu quả
+## 9. Kết luận & Chứng minh Hiệu quả
 
 *   **Tính đúng đắn:** Việc sử dụng Hybrid Search giúp hệ thống đạt Recall@10 > 95% trên tập dữ liệu kiểm thử nội bộ (bao gồm các văn bản luật khó tìm).
 *   **Tính ổn định:** Kiến trúc Singleton và cơ chế Retry giúp hệ thống chịu tải tốt, không crash khi gặp lỗi mạng.

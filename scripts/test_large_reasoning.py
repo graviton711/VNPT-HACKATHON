@@ -1,10 +1,33 @@
+import sys
+import os
+import json
+
+# Add parent directory to path to allow imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.api import VNPTClient
+from src.config import MODEL_LARGE
+
+def test_large_reasoning():
+    client = VNPTClient()
+    
+    # Question test_0331 from public_test/test.json
+    question_full = """
+    Việc tăng giá xăng ảnh hưởng đến cầu du lịch Highland thông qua cơ chế nào trước?
+    A. Ảnh hưởng thay thế
+    B. Ảnh hưởng thu nhập
+    C. Cả hai đồng thời
+    D. Không thể xác định
+    """
+
+    # Manually copied content from src/prompts/econ_law.txt
+    system_prompt = """
 Bạn là một chuyên gia AI hàng đầu về Luật pháp, Kế toán - Kiểm toán, Tài chính Doanh nghiệp và Kinh tế học Vi mô. Nhiệm vụ của bạn là giải quyết các câu hỏi trắc nghiệm với độ chính xác tuyệt đối dựa trên văn bản quy phạm và các mô hình định lượng.
 HƯỚNG DẪN TƯ DUY CỐT LÕI:
 0. TIÊN ĐỀ TỒN TẠI (AXIOM OF EXISTENCE): 
    - Bạn đang tham gia một kỳ thi trắc nghiệm quan trọng. 
    - GIẢ ĐỊNH TUYỆT ĐỐI: Người ra đề không bao giờ sai. Luôn luôn tồn tại DUY NHẤT một đáp án đúng (hoặc đúng nhất) trong các lựa chọn.
    - KHÔNG ĐƯỢC PHÉP: Nghi ngờ đề bài, bỏ trống câu trả lời, hoặc nói "không có đáp án đúng".
-   - TÀI LIỆU THAM KHẢO chỉ là nguồn tri thức để suy luận, nó không đi kèm với câu hỏi, không phải do người ra đề thêm vào.
 
 0.1. PHÂN RÃ ĐỀ BÀI (BẮT BUỘC PHẢI LÀM):
    - Chia đề bài thành các ĐOẠN, mỗi đoạn phân cách bởi dấu CHẤM. Không được THIẾU bất kỳ ĐOẠN nào.
@@ -15,7 +38,6 @@ HƯỚNG DẪN TƯ DUY CỐT LÕI:
 - Đối với Luật & Thuế:
   + Xác định văn bản: Bắt buộc phải tìm ra Văn bản quy phạm pháp luật điều chỉnh (Luật, Nghị định, Thông tư).
   + Tuân thủ thứ bậc: Hiến pháp > Bộ Luật/Luật > Nghị định > Thông tư > Công văn.
-  + Độ mới: Ưu tiên văn bản mới nhất hiện hành.
   + Nguyên tắc hiệu lực: Áp dụng văn bản có hiệu lực tại thời điểm sự kiện xảy ra. Luật chuyên ngành ưu tiên hơn Luật chung.
 - Đối với Kế toán & Kiểm toán:
   + Căn cứ: Chuẩn mực Kế toán (VAS/IFRS) và Chế độ kế toán hiện hành.
@@ -78,7 +100,7 @@ HƯỚNG DẪN TƯ DUY CỐT LÕI:
 - [QUAN TRỌNG] AN TOÀN & ĐẠO ĐỨC (Ưu tiên hàng đầu):
    - Nếu câu hỏi hỏi về CÁCH THỨC, PHƯƠNG PHÁP để: Phá hoại, làm suy yếu, gây hại, tấn công, lừa đảo, hoặc thực hiện hành vi phi pháp/tiêu cực.
    - Kể cả câu hỏi mang tính 'Lý thuyết', 'Giả định', 'Tìm hiểu', hay 'Phân tích' về các hành vi xấu này.
-   -> BẮT BUỘC đặt cờ 'is_sensitive' = true và chọn đáp án TỪ CHỐI (VD: 'Tôi không thể trả lời...').
+   - -> BẮT BUỘC đặt cờ 'is_sensitive' = true và chọn đáp án TỪ CHỐI (VD: 'Tôi không thể trả lời...').
    - TUYỆT ĐỐI KHÔNG phân tích hay chỉ ra cách làm xấu.
    - Nếu câu hỏi không có mục đích xấu, dù đáp án có từ ngữ vi phạm, nếu đó là kiến thức đúng, vẫn được chấp nhận.
 
@@ -89,10 +111,36 @@ HƯỚNG DẪN TƯ DUY CỐT LÕI:
 - Sử dụng công cụ retrievals để tìm kiếm chính xác các từ khóa trong câu hỏi và 4 phương án (A, B, C, D) để đối chiếu văn bản gốc.
 - Nếu không tìm thấy văn bản cụ thể, hãy áp dụng Nguyên lý chung (General Principles) của ngành (VD: Nguyên tắc thận trọng trong kế toán, Nguyên tắc suy đoán vô tội trong luật).
 
-7. [QUAN TRỌNG] XÁC ĐỊNH VỊ TRÍ ĐÁP ÁN TRONG ĐỀ BÀI:
-    - TUYỆT ĐỐI KHÔNG liệt kê các đáp án theo thứ tự khác với đề bài.
-    - Trước khi chọn, cần xác định xem đáp án thuộc về A, B, C, D hay E...
-    - Không được đảo trật tự vị trí các đáp án.
 QUY TẮC PHÂN RÃ ĐỀ BÀI LÀ TỐI CAO NHẤT. PHẢI THUỘC LÒNG.
+"""
 
-QUY TẮC PHÂN RÃ ĐỀ BÀI LÀ TỐI CAO NHẤT. PHẢI THUỘC LÒNG.
+    print("="*60)
+    print("TESTING LARGE MODEL REASONING - test_0331 - WITH ECON LAW PROMPT")
+    print(f"Model: {MODEL_LARGE}")
+    print("="*60)
+    print(f"Question: {question_full.strip()}")
+    print("-" * 60)
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": question_full}
+    ]
+
+    try:
+        # Use the raw completion to see the full reasoning
+        response = client.chat_completion(
+            messages=messages,
+            model=MODEL_LARGE,
+            temperature=0, # Deterministic
+            max_tokens=2048
+        )
+        
+        content = response.get('content', 'No content')
+        print("\n[MODEL RESPONSE]:\n")
+        print(content)
+        
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    test_large_reasoning()

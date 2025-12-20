@@ -42,9 +42,9 @@ RRF_K = 50
 RERANK_POOL_SIZE = 20   # Assess more candidates (Better GPU)
 
 # Concurrency & Batching Limits
-MAX_WORKERS_RAG = 8       # Organizer Limit
-MAX_WORKERS_INFERENCE = 8 # Organizer Limit
-MAX_WORKERS_CALC = 8      # Organizer Limit
+MAX_WORKERS_RAG = 4       # Reduced to fit Total 8
+MAX_WORKERS_INFERENCE = 4 # Reduced to fit Total 8
+MAX_WORKERS_CALC = 8      # Sequential pass can use full 8
 RETRY_BATCH_TOKENS = 18000 
 
 # GPU Safety (Dynamic Detection)

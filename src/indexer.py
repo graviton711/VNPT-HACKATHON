@@ -175,7 +175,20 @@ def parse_file(filepath):
                                         'type': 'history',
                                         'category': 'History'
                                     })
-                            # Check for Law Documents (VBPL) which need semantic chunking
+                            # Check for HCM Toan Tap Format (hcm_complete.json)
+                            # Format: { "full_title": "...", "text": "...", "source": "..." }
+                            elif 'full_title' in entry and 'Hồ Chí Minh Toàn Tap' in entry.get('full_title', ''):
+                                local_items.append({
+                                    'text': entry.get('text', ''),
+                                    'title': entry.get('full_title', ''),
+                                    'url': f"hcm_vol_{hash(entry.get('full_title')) % 1000000}",
+                                    'type': 'history',
+                                    'category': 'History', 
+                                    'source': 'Hồ Chí Minh Toàn Tập'
+                                })
+
+                            # Check for History Format (dang_history.json)
+
                             elif 'content' in entry and ('vbpl' in filepath or 'vbpl' in entry.get('url', '') or 'Luật' in entry.get('title', '') or 'Nghị định' in entry.get('title', '')):
                                 # Use semantic extractor
                                 extracted_articles, law_name = extract_articles(entry['content'])
@@ -288,6 +301,18 @@ def parse_file(filepath):
                                     'category': 'Sắp xếp ĐVHC' 
                                 })
 
+                            # [NEW] Check for History Vietnam Complete (Result of convert_history.py)
+                            elif 'full_title' in entry and 'text' in entry:
+                                local_items.append({
+                                    'text': entry['text'],
+                                    'title': entry['full_title'],
+                                    # Use a safe simplified ID
+                                    'url': f"history_vn_{abs(hash(entry['full_title']))}", 
+                                    'type': 'history',
+                                    'category': 'History',
+                                    'source': 'Lịch sử Việt Nam (15 tập)'
+                                })
+
                             # Flatten otherwise?
                             else:
                                 local_items.append(entry)
@@ -377,20 +402,116 @@ def parse_file(filepath):
                     full_article = header + art_text
                     
                     # If article is HUGE, split it. If small, keep strictly as one.
+                    # If article is HUGE, split it. If small, keep strictly as one.
                     if len(full_article) > 2000:
-                        sub_chunks = chunker.split_text(art_text) # Split raw, then add header
-                        for sub in sub_chunks:
-                            all_docs.append({
-                                "text": header + sub,
-                                "metadata": {
-                                    "source": item.get('url', 'unknown'),
-                                    "source_file": file_basename,
-                                    "title": title,
-                                    "article": t.split(':')[0] if ':' in t else t, # No truncation
-                                    "issuance_date": issuance or "",
-                                    "effective_date": effective or ""
-                                }
-                            })
+                        # [ENHANCED] Smart Clause Splitting
+                        # Attempt to split by Clauses (1., 2., ...) first
+                        import re
+                        clause_pattern = r'(?:\n|^)(\d+\.\s)'
+                        parts = re.split(clause_pattern, c)
+                        
+                        # Logic: split returns [preamble, "1. ", content_1, "2. ", content_2, ...]
+                        # We reconstruct valid clauses.
+                        valid_clauses = []
+                        current_clause_num = ""
+                        
+                        if len(parts) > 1:
+                            # Skip preamble if empty or just whitespace
+                            start_idx = 1 if not parts[0].strip() else 0
+                            
+                            # If preamble exists (un-numbered text at start), handle it
+                            if start_idx == 0:
+                                valid_clauses.append({"num": "Intro", "content": parts[0]})
+                                start_idx = 1
+                            
+                            i = start_idx
+                            while i < len(parts) - 1:
+                                num_marker = parts[i] # "1. "
+                                content = parts[i+1]
+                                num_clean = num_marker.strip().replace('.', '')
+                                valid_clauses.append({"num": num_clean, "content": num_marker + content})
+                                i += 2
+                        
+                        if valid_clauses:
+                            # Successful Clause Split
+                            for cl in valid_clauses:
+                                cl_text = cl['content']
+                                cl_num = cl['num']
+                                
+                                # If Clause itself is huge, recursively split it
+                                if len(cl_text) > 1500:
+                                    sub_sub_chunks = chunker.split_text(cl_text)
+                                    part_sub = 1
+                                    for sub_sub in sub_sub_chunks:
+                                        # Title: "Article X, Clause Y (Part Z)"
+                                        clean_t = t.strip()
+                                        if not clean_t.endswith('.'): clean_t += '.'
+                                        
+                                        if cl_num == "Intro":
+                                            rich_title = f"{header}{clean_t} (Đoạn mở đầu, Phần {part_sub})"
+                                        else:
+                                            rich_title = f"{header}{clean_t} Khoản {cl_num} (Phần {part_sub})"
+                                            
+                                        all_docs.append({
+                                            "text": f"{rich_title}\n{sub_sub}",
+                                            "metadata": {
+                                                "source": item.get('url', 'unknown'),
+                                                "source_file": file_basename,
+                                                "title": title,
+                                                "article": t.split(':')[0] if ':' in t else t, 
+                                                "clause": cl_num,
+                                                "issuance_date": issuance or "",
+                                                "effective_date": effective or "",
+                                                "is_split": True
+                                            }
+                                        })
+                                        part_sub += 1
+                                else:
+                                    # Perfect Clause Chunk
+                                    clean_t = t.strip()
+                                    if not clean_t.endswith('.'): clean_t += '.'
+                                    
+                                    if cl_num == "Intro":
+                                        rich_title = f"{header}{clean_t} (Đoạn mở đầu)"
+                                    else:
+                                        rich_title = f"{header}{clean_t} Khoản {cl_num}"
+                                        
+                                    all_docs.append({
+                                        "text": f"{rich_title}\n{cl_text}",
+                                        "metadata": {
+                                            "source": item.get('url', 'unknown'),
+                                            "source_file": file_basename,
+                                            "title": title,
+                                            "article": t.split(':')[0] if ':' in t else t, 
+                                            "clause": cl_num,
+                                            "issuance_date": issuance or "",
+                                            "effective_date": effective or ""
+                                        }
+                                    })
+                        else:
+                            # Fallback: No clauses found, use standard splitting (Part 1, Part 2)
+                            sub_chunks = chunker.split_text(c) 
+                            part_num = 1
+                            for sub in sub_chunks:
+                                clean_t = t.strip()
+                                if not clean_t.endswith('.'): clean_t += '.'
+                                    
+                                rich_text = f"{header}{clean_t} (Phần {part_num})\n{sub}"
+                                
+                                all_docs.append({
+                                    "text": rich_text,
+                                    "metadata": {
+                                        "source": item.get('url', 'unknown'),
+                                        "source_file": file_basename,
+                                        "title": title,
+                                        "article": t.split(':')[0] if ':' in t else t, 
+                                        "issuance_date": issuance or "",
+                                        "effective_date": effective or "",
+                                        "is_split": True,
+                                        "part": part_num
+                                    }
+                                })
+                                part_num += 1
                     else:
                         # Optimal case: 1 Article = 1 Doc
                         all_docs.append({
@@ -542,32 +663,18 @@ class Indexer:
             print("No new files to index.")
             return
 
-        # 2. Parallel Parsing (CPU Bound)
-        all_docs = []
-        print(f"Parsing {len(files_to_process)} files with {max_workers} processes...")
+        # [STREAMING REFACTOR]
+        # Instead of parsing ALL files effectively loading GBs into RAM, 
+        # We parse -> buffer -> index -> release RAM.
         
-        # [WINDOWS FIX] Use ThreadPoolExecutor to prevent BrokenProcessPool error
-        # Parsing is fast enough that Threads are fine, and safer on Windows.
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_file = {executor.submit(parse_file, f): f for f in files_to_process}
-            for future in tqdm(as_completed(future_to_file), total=len(files_to_process), desc="Parsing Files"):
-                result = future.result()
-                if result:
-                    all_docs.extend(result)
-
-        print(f"Total chunks prepared: {len(all_docs)}")
-        if not all_docs:
-            print("No documents generated from files.")
-            return
-
-        # 3. Multi-threaded Indexing (IO Bound)
-        print(f"Parsed. Now batching {len(all_docs)} docs...")
-        sys.stdout.flush()
-
-        BATCH_SIZE = 200 # Target Batch Size
-        DB_WRITE_BATCH = 1000 # Buffer DB writes
-        LIMIT_PER_MINUTE = 500 # Max allowed by API
+        STREAM_BUFFER_SIZE = 5000 # Buffer 5000 chunks before indexing
+        buffer_docs = []
+        total_chunks_processed = 0
+        
+        # 2 Setup Indexing Resources
+        BATCH_SIZE = 20 # Target Batch Size
         MAX_WORKERS = max_workers
+        LIMIT_PER_MINUTE = 500 
         
         rate_limiter = RateLimiter(LIMIT_PER_MINUTE)
         
@@ -576,9 +683,9 @@ class Indexer:
         session = requests.Session()
         
         retry_strategy = Retry(
-            total=5,
-            backoff_factor=1, # Wait 1s, 2s, 4s...
-            status_forcelist=[429, 500, 502, 503, 504],
+            total=1000,
+            backoff_factor=1,
+            status_forcelist=[401, 429, 500, 502, 503, 504],
             allowed_methods=["POST"]
         )
         
@@ -589,79 +696,77 @@ class Indexer:
         )
         session.mount('https://', adapter)
         
-        # Adaptive Batching
-        batches = []
-        current_batch = []
-        current_tokens = 0
-        MAX_EMBEDDING_TOKENS = 7000
-        MAX_BATCH_SIZE = 200
-        
-        print("Grouping batches adaptively...")
-        for doc in all_docs:
-            t_est = len(doc['text']) / 2.5
+        # Helper to Flush Buffer
+        def flush_buffer(docs_to_index):
+            if not docs_to_index: return 0
             
-            # Flush if limits reached
-            if (current_tokens + t_est > MAX_EMBEDDING_TOKENS) or (len(current_batch) >= MAX_BATCH_SIZE):
-                batches.append(current_batch)
-                current_batch = []
-                current_tokens = 0
+            print(f"\n[STREAM] Flushing buffer of {len(docs_to_index)} docs...")
             
-            current_batch.append(doc)
-            current_tokens += t_est
+            # Create batches
+            batches = [docs_to_index[i:i + BATCH_SIZE] for i in range(0, len(docs_to_index), BATCH_SIZE)]
             
-        if current_batch:
-            batches.append(current_batch)
-
-        print(f"Processing {len(batches)} adaptive batches with {MAX_WORKERS} threads...")
-        sys.stdout.flush()
-        
-        write_buffer_texts = []
-        write_buffer_embs = []
-        write_buffer_metas = []
-
-        try:
+            # Process Batches in Parallel
+            processed_count = 0
             with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-                futures = []
-                for i, batch in enumerate(batches):
-                    # Pass session to worker
-                    futures.append(executor.submit(self._process_batch, batch, i, rate_limiter, session))
+                # Submit all batches
+                futures = {executor.submit(self._process_batch, b, i, rate_limiter, session): i for i, b in enumerate(batches)}
                 
-                # Retrieve results as they complete
-                for future in tqdm(as_completed(futures), total=len(batches), desc="Indexing Batches"):
+                db_buffer_docs = []
+                db_buffer_embs = []
+                db_buffer_metas = []
+                
+                for future in tqdm(as_completed(futures), total=len(batches), desc="Indexing Stream"):
                     try:
                         result = future.result()
                         if result:
-                            # Unpack
-                            b_texts, b_embs, b_metas = result
-                            
-                            # Buffer Data
-                            write_buffer_texts.extend(b_texts)
-                            write_buffer_embs.extend(b_embs)
-                            write_buffer_metas.extend(b_metas)
-                            
-                            # Flush Buffer if full
-                            if len(write_buffer_texts) >= DB_WRITE_BATCH:
-                                self.vector_store.add_batch(write_buffer_texts, write_buffer_embs, write_buffer_metas)
-                                write_buffer_texts = []
-                                write_buffer_embs = []
-                                write_buffer_metas = []
-                                
-                        else:
-                            print("Batch failed (returned None).")
+                            # Unpack result: (texts, embs, metas)
+                            texts, embs, metas = result
+                            db_buffer_docs.extend(texts)
+                            db_buffer_embs.extend(embs)
+                            db_buffer_metas.extend(metas)
+                            processed_count += len(texts)
                     except Exception as ex:
-                        print(f"CRITICAL ERROR in future result: {ex}")
-                        import traceback
-                        traceback.print_exc()
-            
-            # Flush remaining buffer
-            if write_buffer_texts:
-                self.vector_store.add_batch(write_buffer_texts, write_buffer_embs, write_buffer_metas)
+                        print(f"Batch Error: {ex}")
                 
-        finally:
-            session.close()
+                # Write to DB if data
+                if db_buffer_docs:
+                    print(f"Writing {len(db_buffer_docs)} vetted docs to ChromaDB...")
+                    self.vector_store.add_batch(db_buffer_docs, db_buffer_embs, db_buffer_metas)
+            
+            return processed_count
 
-        print("Indexing completed.")
-        sys.stdout.flush()
+        # 3. Main Streaming Loop
+        print(f"Streaming {len(files_to_process)} files with {max_workers} threads...")
+        
+        # We process files in chunks to avoid opening too many at once
+        FILE_CHUNK_SIZE = 10 # Process 10 files at a time
+        
+        for i in range(0, len(files_to_process), FILE_CHUNK_SIZE):
+            file_batch = files_to_process[i:i + FILE_CHUNK_SIZE]
+            
+            # Parse this small batch of files
+            with ThreadPoolExecutor(max_workers=min(len(file_batch), MAX_WORKERS)) as executor:
+                future_to_file = {executor.submit(parse_file, f): f for f in file_batch}
+                
+                for future in as_completed(future_to_file):
+                    result = future.result()
+                    if result:
+                        buffer_docs.extend(result)
+            
+            # Check if buffer is full
+            if len(buffer_docs) >= STREAM_BUFFER_SIZE:
+                cnt = flush_buffer(buffer_docs)
+                total_chunks_processed += cnt
+                buffer_docs = [] # Clear RAM
+                import gc
+                gc.collect()
+
+        # Final Flush
+        if buffer_docs:
+            cnt = flush_buffer(buffer_docs)
+            total_chunks_processed += cnt
+            
+        print(f"\n[DONE] Total chunks indexed: {total_chunks_processed}")
 
     def delete_file(self, filename):
         """Delete all documents associated with a source file."""
