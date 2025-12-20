@@ -14,5 +14,3 @@ transformers==4.37.2
 # Optional for local test
 torch==2.2.1
 # llama-cpp-python
-pdfplumber
-networkx

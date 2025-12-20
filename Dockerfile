@@ -19,7 +19,7 @@ COPY . /code
 
 # INSTALL LIBRARIES
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir -r requirements.txt
+    pip3 install --default-timeout=1000 --no-cache-dir -r requirements.txt
 
 # EXECUTION
 RUN chmod +x /code/inference.sh

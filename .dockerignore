@@ -20,6 +20,17 @@ coverage.xml
 .pytest_cache/
 .mypy_cache/
 local_models/
+# Build Context Optimization (Exclude all raw data & dev scripts)
+data/
+data_raw/
+pdf_data/
+crawlers/
+process_data/
+scripts/
+docs/
+public_test/
+analysis/
+*.md
 # Keep data and db for the submission if we want to include pre-indexed data
 # If you want a small image and build indices inside, uncomment below:
 # # chroma_db/

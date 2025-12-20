@@ -22,6 +22,8 @@ logging.getLogger("transformers.tokenization_utils_base").setLevel(logging.ERROR
 
 logger = setup_logger(__name__)
 
+from typing import List, Dict, Any
+
 class Retriever:
     """
     Implements a Hybrid Retrieval System combining Vector Search (Semantic) and BM25 (Lexical).

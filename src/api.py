@@ -14,8 +14,13 @@ class VNPTClient:
     """
     def __init__(self, key_file_path='api_keys/api-keys.json'):
         self.keys = self._load_keys(key_file_path)
-        self.base_url = "https://api.idg.vnpt.vn/data-service/v1/chat/completions"
-        self.embedding_url = "https://api.idg.vnpt.vn/data-service/vnptai-hackathon-embedding"
+        # [MODIFIED] Allow override from Env Var for Mock Testing
+        self.api_root = os.getenv('VNPT_API_URL', "https://api.idg.vnpt.vn/data-service")
+        # Remove trailing slash if present
+        if self.api_root.endswith('/'): self.api_root = self.api_root[:-1]
+        
+        self.base_url = f"{self.api_root}/v1/chat/completions"
+        self.embedding_url = f"{self.api_root}/vnptai-hackathon-embedding"
         self.request_count = 0
 
     def get_request_count(self):

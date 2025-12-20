@@ -1,6 +1,6 @@
 # VNPT AI Hackathon 2025: Báo Cáo Kỹ Thuật & Tài Liệu Hệ Thống
 
-**Đội thi:** [Tên Đội]
+**Đội thi:** Duel Warrior
 **Phiên bản:** 1.0.0 (Submission v1)
 
 ## 1. Tổng quan Hệ thống (System Overview)
@@ -285,11 +285,13 @@ pip install -r requirements.txt
 python predict.py --input public_test/test.json --output output/submission.json
 ```
 
-### 7.1. Cấu hình Nâng cao (Advanced Configuration)
-Hệ thống sử dụng cơ chế **Dynamic Config Loading** ưu tiên môi trường:
-*   `src/config_public.py`: Cấu hình cho môi trường Public (Test).
-*   `src/config_private.py`: Cấu hình cho môi trường Private (High Perf).
-*   **Threading:** Có thể điều chỉnh `MAX_WORKERS_RAG`, `MAX_WORKERS_INFERENCE` trong các file này để kiểm soát số lượng luồng song song (Mặc định: Total 8 threads để đảm bảo ổn định).
+### 8.1. Cấu hình (Configuration)
+Hệ thống được cấu hình mặc định tối ưu cho môi trường Private Test (8GB VRAM, High Performance) thông qua file `src/config.py`.
+
+Các tham số quan trọng trong `src/config.py`:
+*   `MAX_RETRIES`: Số lần thử lại khi gặp lỗi API (Mặc định: 10000).
+*   `USE_RERANKER`: Bật/Tắt Cross-Encoder (Mặc định: True).
+*   `MAX_GPU_WORKERS`: Tự động phát hiện dựa trên VRAM khả dụng.
 
 ---
 

@@ -45,7 +45,9 @@ class BatchSolver:
         try:
             self.retriever = Retriever()
         except Exception as e:
-            logger.warning(f"Could not initialize Retriever: {e}")
+            import traceback
+            logger.error(f"Could not initialize Retriever: {e}")
+            logger.error(traceback.format_exc())
             self.retriever = None
             
         self.limiter_small = RateLimiter(limit=RATE_LIMIT_SMALL, interval=RATE_LIMIT_INTERVAL_CHAT)
@@ -133,11 +135,7 @@ class BatchSolver:
         prepared_data = []
         domain_map = {}
         
-        # ... (Preparation logic omitted for brevity, it's unchanged) ...
-        
-        # [Existing code for preparation would be here, but we are skipping to the save part]
-        # Wait, I need to target the SAVE block specifically.
-        # Let's do this in two chunks.
+        # Prepare RAG and Classification in parallel
         
         with ThreadPoolExecutor(max_workers=MAX_WORKERS_RAG + 5) as executor: # +5 for classification threads
             # A. Submit RAG Preparation

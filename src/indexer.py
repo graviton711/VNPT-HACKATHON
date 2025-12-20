@@ -134,7 +134,7 @@ def extract_articles(text):
     return articles, law_name
 
 def parse_file(filepath):
-    chunker = RecursiveChunker(chunk_size=1200, chunk_overlap=200)
+    chunker = RecursiveChunker(chunk_size=1000, chunk_overlap=200)
     all_docs = []
     file_basename = os.path.basename(filepath)
     is_jsonl = filepath.endswith('.jsonl')
@@ -175,17 +175,7 @@ def parse_file(filepath):
                                         'type': 'history',
                                         'category': 'History'
                                     })
-                            # Check for HCM Toan Tap Format (hcm_complete.json)
-                            # Format: { "full_title": "...", "text": "...", "source": "..." }
-                            elif 'full_title' in entry and 'Hồ Chí Minh Toàn Tap' in entry.get('full_title', ''):
-                                local_items.append({
-                                    'text': entry.get('text', ''),
-                                    'title': entry.get('full_title', ''),
-                                    'url': f"hcm_vol_{hash(entry.get('full_title')) % 1000000}",
-                                    'type': 'history',
-                                    'category': 'History', 
-                                    'source': 'Hồ Chí Minh Toàn Tập'
-                                })
+
 
                             # Check for History Format (dang_history.json)
 

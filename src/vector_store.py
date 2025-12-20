@@ -19,6 +19,15 @@ class VectorStore:
         # Disable ChromaDB Telemetry to speed up init
         os.environ["ANONYMIZED_TELEMETRY"] = "False"
         
+        # [HOTFIX] Mock posthog to bypass Python 3.8 incompatibility (dict[] syntax error)
+        try:
+            import sys
+            from unittest.mock import MagicMock
+            sys.modules["posthog"] = MagicMock()
+            sys.modules["chromadb.telemetry.product.posthog"] = MagicMock()
+        except Exception:
+            pass
+
         # Lazy import to avoid startup lag if not used
         import chromadb
         
