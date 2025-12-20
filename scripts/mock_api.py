@@ -1,66 +1,91 @@
-from flask import Flask, request, jsonify
+import http.server
+import socketserver
+import json
 import random
 import time
+import re
 
-app = Flask(__name__)
+PORT = 5000
 
-# Mock Embeddings (Float list of length 768 or 1024)
-@app.route('/vnptai-hackathon-embedding', methods=['POST'])
-def embedding():
-    data = request.json
-    texts = data.get('input', [])
-    if isinstance(texts, str): texts = [texts]
-    
-    print(f"[MOCK] Embedding request for {len(texts)} texts")
-    
-    # Generate random vector
-    mock_data = []
-    for i in range(len(texts)):
-        mock_data.append({
-            "object": "embedding",
-            "embedding": [random.random() for _ in range(768)], # Standard size
-            "index": i
-        })
+class MockHandler(http.server.SimpleHTTPRequestHandler):
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode('utf-8'))
         
-    return jsonify({
-        "object": "list",
-        "data": mock_data,
-        "model": "mock-embedding-v1",
-        "usage": {"prompt_tokens": 10, "total_tokens": 10}
-    })
+        # Handle Embedding Request
+        if self.path.endswith('/vnptai-hackathon-embedding'):
+            self._handle_embedding(data)
+        
+        # Handle Chat Completion (Small & Large)
+        elif '/chat/completions' in self.path:
+            self._handle_chat(data)
+            
+        else:
+            self.send_response(404)
+            self.end_headers()
 
-# Mock Chat Completion
-@app.route('/data-service/v1/chat/completions/vnptai-hackathon-small', methods=['POST'])
-@app.route('/data-service/v1/chat/completions/vnptai-hackathon-large', methods=['POST'])
-def chat():
-    data = request.json
-    messages = data.get('messages', [])
-    last_msg = messages[-1]['content'] if messages else ""
-    
-    print(f"[MOCK] Chat request: {last_msg[:50]}...")
-    
-    # Simple Mock Answer
-    answer = "Đây là câu trả lời kiểm thử từ Mock API. Hệ thống hoạt động tốt."
-    
-    # Return formatted response
-    return jsonify({
-        "id": "mock-chat-123",
-        "object": "chat.completion",
-        "created": int(time.time()),
-        "model": data.get('model', 'mock-model'),
-        "choices": [{
-            "index": 0,
-            "message": {
-                "role": "assistant",
-                "content": answer
-            },
-            "finish_reason": "stop"
-        }],
-        "usage": {"prompt_tokens": 10, "completion_tokens": 10, "total_tokens": 20}
-    })
+    def _handle_embedding(self, data):
+        texts = data.get('input', [])
+        if isinstance(texts, str): texts = [texts]
+        
+        print(f"[MOCK] Embedding request for {len(texts)} texts")
+        
+        mock_data = []
+        for i in range(len(texts)):
+            mock_data.append({
+                "object": "embedding",
+                "embedding": [random.random() for _ in range(1024)],
+                "index": i
+            })
+            
+        response = {
+            "object": "list",
+            "data": mock_data,
+            "model": "mock-embedding-v1",
+            "usage": {"prompt_tokens": 10, "total_tokens": 10}
+        }
+        self._send_json(response)
+
+    def _handle_chat(self, data):
+        messages = data.get('messages', [])
+        last_msg = messages[-1]['content'] if messages else ""
+        print(f"[MOCK] Chat request: {last_msg[:50]}...")
+        
+        answer = "MOCK ANSWER: Đây là câu trả lời kiểm thử từ hệ thống giả lập."
+        
+        response = {
+            "id": "mock-chat-123",
+            "object": "chat.completion",
+            "created": int(time.time()),
+            "model": data.get('model', 'mock-model'),
+            "choices": [{
+                "index": 0,
+                "message": {
+                    "role": "assistant",
+                    "content": answer
+                },
+                "finish_reason": "stop"
+            }],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 10, "total_tokens": 20}
+        }
+        self._send_json(response)
+
+    def _send_json(self, data):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode('utf-8'))
+
+    def log_message(self, format, *args):
+        # Suppress default logging to keep terminal clean
+        return
 
 if __name__ == '__main__':
-    print("Starting MOCK VNPT API on port 5000...")
-    print("Usage: Configure your client to point to http://localhost:5000")
-    # Listen on all interfaces
-    app.run(host='0.0.0.0', port=5000)
+    print(f"Starting DEPENDENCY-FREE Mock API on port {PORT}...")
+    print("Use Ctrl+C to stop.")
+    with socketserver.TCPServer(("", PORT), MockHandler) as httpd:
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("\nStopping server...")

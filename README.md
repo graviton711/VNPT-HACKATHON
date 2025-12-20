@@ -250,8 +250,8 @@ Hệ thống được đóng gói Container hóa hoàn toàn (Dockerized), đả
 
 **Cách 1: Chạy qua Docker (Khuyến nghị - Standard Submission)**
 ```bash
-# 1. Load Image (nếu đã tải về) hoặc Build
-docker build -t vnpt-submission:v1 .
+# 1. Pull Image (Từ Docker Hub)
+docker pull graviton711/submission-vnpt-final:latest
 
 # 2. Chạy Container (với GPU)
 # Script inference.sh sẽ tự động được kích hoạt
@@ -260,7 +260,7 @@ docker build -t vnpt-submission:v1 .
 docker run --gpus all --rm \
   -v $(pwd)/output:/code/output \
   -v $(pwd)/public_test/test.json:/code/private_test.json \
-  vnpt-submission:v1
+  graviton711/submission-vnpt-final:latest
 ```
 
 **Tùy chọn: Thay đổi API Key (Dành cho Ban Giám Khảo/BTC):**
@@ -270,7 +270,7 @@ docker run --gpus all --rm \
 docker run --gpus all --rm \
   -v $(pwd)/output:/code/output \
   -v /absolute/path/to/my-keys.json:/code/api_keys/api-keys.json \
-  vnpt-submission:v1
+  graviton711/submission-vnpt-final:latest
 ```
 *(Lệnh này sẽ dùng file `my-keys.json` của giám khảo đè lên file `/code/api_keys/api-keys.json` mặc định).*
 
