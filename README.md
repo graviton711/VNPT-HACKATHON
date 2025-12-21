@@ -299,7 +299,7 @@ Các tham số quan trọng trong `src/config.py`:
 
 *   **Tính đúng đắn:** Việc sử dụng Hybrid Search giúp hệ thống đạt Recall@10 > 95% trên tập dữ liệu kiểm thử nội bộ (bao gồm các văn bản luật khó tìm).
 *   **Tính ổn định:** Kiến trúc Singleton và cơ chế Retry giúp hệ thống chịu tải tốt, không crash khi gặp lỗi mạng.
-*   **Tính tuân thủ:** Đầu ra JSON được chuẩn hóa chặt chẽ, đảm bảo không sai định dạng Submission.
+*   **Tính tuân thủ:** Đầu ra CSV (`submission.csv`, `submission_time.csv`) được chuẩn hóa chặt chẽ theo quy định BTC.
 
 ---
 *Tài liệu này xác nhận cấu trúc kỹ thuật và phương pháp luận của nhóm phát triển.*
