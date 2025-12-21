@@ -259,12 +259,31 @@ python scripts/convert_pdf_ktdl.py
 ```
 
 ### 7.4. Indexing (Đánh chỉ mục)
-Sau khi có dữ liệu sạch trong thư mục `data/`, chạy lệnh sau để tạo Vector DB và BM25 Index:
 
+Quy trình Indexing được chia làm 2 bước riêng biệt:
+
+**Bước 1: Vector Indexing (ChromaDB)**
+Lệnh này chỉ đẩy dữ liệu vào Vector DB.
 ```bash
-python src/indexer.py --workers 8
+python src/indexer.py --workers 8 --limit 1000
 ```
-*(Quá trình này có thể mất từ 2-4 tiếng tùy vào phần cứng).*
+
+*Để index riêng lẻ một file (ví dụ update lại file luật mới):*
+```bash
+python src/indexer.py --file data/new_law.json
+```
+
+*Để xóa toàn bộ dữ liệu của một file khỏi Database:*
+```bash
+python src/indexer.py --delete data/wrong_file.json
+```
+
+**Bước 2: Keyword Indexing (BM25)**
+Sau khi ChromaDB đã có dữ liệu, chạy lệnh này để đồng bộ và xây dựng chỉ mục từ khóa (BM25). Script sẽ tự động rà soát dữ liệu trong ChromaDB để cập nhật.
+```bash
+python scripts/build_bm25.py
+```
+*(Quá trình này có thể mất từ 15-30 phút tùy lượng dữ liệu).*
 
 ---
 
@@ -273,10 +292,11 @@ python src/indexer.py --workers 8
 Hệ thống được đóng gói Container hóa hoàn toàn (Dockerized), đảm bảo tính nhất quán giữa môi trường phát triển và môi trường chấm thi.
 
 ### Yêu cầu Hệ thống
-*   **OS:** Linux (Ubuntu 20.04+) / Windows WSL2.
-*   **Python:** 3.8.10 (Tương thích Base Image).
-*   **GPU:** Khuyến nghị 8GB VRAM (để chạy Re-ranker & Quantized Model).
-*   **Disk:** ~40GB (Bao gồm Pre-indexed Database).
+*   **OS:** Linux (Ubuntu 22.04+) / Windows WSL2.
+*   **CUDA:** 12.2 (Tương thích hoàn toàn với Base Image `nvidia/cuda:12.2.0`).
+*   **Python:** 3.10+ (Theo Base Image Ubuntu 22.04).
+*   **GPU:** Tối thiểu 4GB VRAM (Hệ thống đã tối ưu cho T4/L4). Khuyến nghị 8GB+.
+*   **Disk:** ~40GB (Bao gồm Pre-indexed Database 15GB).
 
 
 ### 8.2. Hướng dẫn Chấm điểm (Official Submission Workflow)
