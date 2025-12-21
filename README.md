@@ -246,42 +246,65 @@ Hệ thống được đóng gói Container hóa hoàn toàn (Dockerized), đả
 *   **GPU:** Khuyến nghị 8GB VRAM (để chạy Re-ranker & Quantized Model).
 *   **Disk:** ~40GB (Bao gồm Pre-indexed Database).
 
-### Hướng dẫn Chạy (Quick Start)
 
-**Cách 1: Chạy qua Docker (Khuyến nghị - Standard Submission)**
+### 8.2. Hướng dẫn Chấm điểm (Official Submission Workflow)
+
+Đây là quy trình từng bước để Ban Tổ Chức (BTC) chạy chấm điểm với file đề thi và API Key riêng:
+
+**Bước 1: Tải Image**
 ```bash
-# 1. Pull Image (Từ Docker Hub)
 docker pull graviton711/submission-vnpt-final:latest
-
-# 2. Chạy Container (với GPU)
-# Script inference.sh sẽ tự động được kích hoạt
-# Mount output: Để lấy kết quả submission.csv
-# Mount input: Để nạp file private_test.json (Giả lập)
-docker run --gpus all --rm \
-  -v $(pwd)/output:/code/output \
-  -v $(pwd)/public_test/test.json:/code/private_test.json \
-  graviton711/submission-vnpt-final:latest
 ```
 
-**Tùy chọn: Thay đổi API Key (Dành cho Ban Giám Khảo/BTC):**
-    Để sử dụng API Key riêng, vui lòng mount đè file config và chỉ định đường dẫn output rõ ràng:
+**Bước 2: Chuẩn bị tài nguyên**
+Trên máy chấm thi, đảm bảo đã có:
+*   File đề thi: `/path/to/private_test.json`
+*   File API Key: `/path/to/btc_keys.json` (Format JSON như BTC quy định)
+*   Thư mục hứng kết quả: `/path/to/output_folder/`
 
-    ```bash
-    docker run --gpus all --rm \
-      -v $(pwd)/public_test/test.json:/data/test.json \
-      -v $(pwd)/output:/output \
-      -v /absolute/path/to/my-keys.json:/code/api_keys/api-keys.json \
-      graviton711/submission-vnpt-final:latest \
-      python predict.py --input /data/test.json --output /output/submission.json
-    ```
-    *(Lệnh này kết hợp cả 3 việc: Nạp đề thi, Nạp Key giám khảo, và Xuất file kết quả ra ngoài).*
+**Bước 3: Chạy lệnh Chấm điểm (Full Mount)**
+Chạy lệnh sau để map toàn bộ tài nguyên vào container:
 
-**Cách 2: Chạy tại cục bộ (Development Mode)**
+```bash
+docker run --gpus all --rm \
+  -v /path/to/private_test.json:/data/test.json \
+  -v /path/to/output_folder:/output \
+  -v /path/to/btc_keys.json:/code/api_keys/api-keys.json \
+  graviton711/submission-vnpt-final:latest \
+  python predict.py --input /data/test.json --output /output/submission.json
+```
+
+**Ví dụ cụ thể (Concrete Example):**
+Giả sử trên máy BTC có cấu trúc thư mục như sau:
+*   Đề thi nằm tại: `/home/btc/data/private_test_final.json`
+*   Key nằm tại: `/home/btc/keys/secret_keys.json`
+*   Muốn lưu kết quả tại: `/home/btc/submission_results/`
+
+Lệnh chạy sẽ là:
+```bash
+docker run --gpus all --rm \
+  -v /home/btc/data/private_test_final.json:/data/test.json \
+  -v /home/btc/submission_results:/output \
+  -v /home/btc/keys/secret_keys.json:/code/api_keys/api-keys.json \
+  graviton711/submission-vnpt-final:latest \
+  python predict.py --input /data/test.json --output /output/submission.json
+```
+
+**Giải thích tham số:**
+*   `-v ...:/code/api_keys/api-keys.json`: Mount file key của BTC vào đúng đường dẫn mà code mặc định đọc (`src/api.py`).
+*   `/data/test.json`: Đường dẫn giả lập trong container chứa file input.
+*   `/output`: Đường dẫn giả lập trong container để ghi file `submission.json` và `submission.csv`.
+
+**Kết quả:**
+Sau khi chạy xong, file `submission.csv` và `submission_time.csv` sẽ xuất hiện tại thư mục `/path/to/output_folder/` trên máy host.
+
+**Cách 2: Chạy tại cục bộ (Development Mode - Windows/Linux Manual)**
 ```bash
 # 1. Cài đặt thư viện
 pip install -r requirements.txt
 
-# 2. Cấu hình API Key trong api_keys/api-keys.json
+# 2. Cấu hình API Key
+# Tạo file api_keys/api-keys.json và paste key vào.
 
 # 3. Chạy Inference
 python predict.py --input public_test/test.json --output output/submission.json

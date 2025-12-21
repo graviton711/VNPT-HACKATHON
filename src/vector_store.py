@@ -1,14 +1,16 @@
 # FIX: Override sqlite3 for ChromaDB on old systems/Docker
-try:
-    __import__('pysqlite3')
-    import sys
-    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-except ImportError:
-    pass
+# try:
+#     __import__('pysqlite3')
+#     import sys
+#     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# except ImportError:
+#     pass
 
 import os
 import uuid
 import hashlib
+import chromadb
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
 class VectorStore:
     def __init__(self, collection_name="vnpt_rag_collection", persist_directory="chroma_db"):
@@ -36,6 +38,11 @@ class VectorStore:
         self.collection_name = collection_name
         
         # Initialize Client
+        self._init_chroma()
+
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(5), retry=retry_if_exception_type(Exception))
+    def _init_chroma(self):
+        print(f"[VectorStore] Connecting to ChromaDB at '{self.persist_directory}' (Attempting)...")
         self.client = chromadb.PersistentClient(path=self.persist_directory)
         
         self.collection = self.client.get_or_create_collection(
@@ -208,4 +215,3 @@ class VectorStore:
         except Exception as e:
             print(f"[VectorStore] Error fetching IDs: {e}")
             return set()
-
