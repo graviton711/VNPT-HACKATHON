@@ -264,15 +264,17 @@ docker run --gpus all --rm \
 ```
 
 **Tùy chọn: Thay đổi API Key (Dành cho Ban Giám Khảo/BTC):**
-Để sử dụng API Key riêng mà không cần build lại Image, vui lòng dùng tham số `-v` để mount đè file config:
+    Để sử dụng API Key riêng, vui lòng mount đè file config và chỉ định đường dẫn output rõ ràng:
 
-```bash
-docker run --gpus all --rm \
-  -v $(pwd)/output:/code/output \
-  -v /absolute/path/to/my-keys.json:/code/api_keys/api-keys.json \
-  graviton711/submission-vnpt-final:latest
-```
-*(Lệnh này sẽ dùng file `my-keys.json` của giám khảo đè lên file `/code/api_keys/api-keys.json` mặc định).*
+    ```bash
+    docker run --gpus all --rm \
+      -v $(pwd)/public_test/test.json:/data/test.json \
+      -v $(pwd)/output:/output \
+      -v /absolute/path/to/my-keys.json:/code/api_keys/api-keys.json \
+      graviton711/submission-vnpt-final:latest \
+      python predict.py --input /data/test.json --output /output/submission.json
+    ```
+    *(Lệnh này kết hợp cả 3 việc: Nạp đề thi, Nạp Key giám khảo, và Xuất file kết quả ra ngoài).*
 
 **Cách 2: Chạy tại cục bộ (Development Mode)**
 ```bash
