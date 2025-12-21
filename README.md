@@ -179,8 +179,33 @@ Hệ thống đảm bảo tính toàn vẹn và có cấu trúc của dữ liệ
 
 Theo yêu cầu xác minh của Ban Tổ Chức, dưới đây là hướng dẫn chi tiết để chạy lại các script thu thập và xử lý dữ liệu.
 
-### 7.1. Crawling (Thu thập Dữ liệu)
-Các script nằm trong thư mục `crawlers/`. Đảm bảo đã cài đặt thư viện (`pip install -r requirements.txt`).
+### 7.1. Crawling (Thu thập Dữ liệu) - Chi tiết
+
+Các script crawler nằm trong thư mục `crawlers/`, được chia thành các nhóm dữ liệu chính:
+
+| Nhóm Dữ liệu | Tên Script (File) | Mô tả Chức năng | Nguồn |
+| :--- | :--- | :--- | :--- |
+| **Văn bản Luật (Base)** | `crawl_codes_vbpl.py` | Thu thập các Bộ luật (Code) gốc. | VBPL |
+| | `crawl_laws_vbpl.py` | Thu thập các Luật (2015-nay). | VBPL |
+| | `crawl_laws_vbpl_extended.py` | Thu thập Luật mở rộng (giai đoạn cũ hơn). | VBPL |
+| | `crawl_legal.py` | Crawler dự phòng cho các văn bản pháp luật chung. | HthongPhapLuat |
+| **Nghị định & Thông tư** | `crawl_decrees_vbpl.py` | Thu thập Nghị định (Decrees). | VBPL |
+| | `crawl_vbpl_thong_tu.py` | Thu thập Thông tư hướng dẫn. | VBPL |
+| | `crawl_agency55_vbpl.py` | Thu thập văn bản đặc thù cơ quan (Bộ/Ngành). | VBPL |
+| | `crawl_resolutions_vbpl.py` | Thu thập Nghị quyết chung. | VBPL |
+| | `crawl_resolutions.py` | Thu thập Nghị quyết chuyên đề (Sắp xếp ĐVHC). | HthongPhapLuat |
+| **Nguồn Bổ sung** | `crawl_luatvietnam.py` | Crawler tổng hợp từ LuatVietnam. | LuatVietnam |
+| | `crawl_decrees_luatvietnam.py` | Thu thập Nghị định từ nguồn LuatVietnam. | LuatVietnam |
+| | `crawl_quyetdinh_luatvietnam.py` | Thu thập Quyết định từ LuatVietnam. | LuatVietnam |
+| **Hành chính công & Data**| `crawl_dvc_procedures.py` | Lấy danh sách Thủ tục hành chính quốc gia. | DVCQG |
+| | `crawl_dvc_details_stage2.py` | Lấy chi tiết từng bước thực hiện thủ tục. | DVCQG |
+| | `crawl_flourish.py` | Crawl danh sách ĐVHC sau sáp nhập (2025). | Flourish |
+| **Kiến thức Tổng quát** | `crawl_provinces_wiki.py` | Thông tin địa lý, hành chính 63 tỉnh thành. | Wikipedia |
+| | `crawl_party_history.py` | Lịch sử Đảng và các kỳ đại hội. | Wikipedia |
+| | `crawl_economics_voer.py` | Kiến thức kinh tế học cơ bản. | Voer.edu.vn |
+
+Các script này đều hỗ trợ cơ chế Resume (tiếp tục khi ngắt quãng) và xử lý Rate Limit tự động.
+Đảm bảo đã cài đặt thư viện (`pip install -r requirements.txt`).
 
 **Ví dụ chạy Crawl Văn bản Luật (VBPL):**
 ```bash
@@ -212,8 +237,15 @@ python process_data/process_ho_chi_minh_data.py
 python process_data/process_morton.py 
 ```
 
-### 7.3. PDF Conversion (Chuyển đổi Tài liệu PDF)
-Các script nằm trong thư mục `scripts/`. Sử dụng để trích xuất văn bản từ PDF gốc (Lịch sử 15 tập, Giáo trình).
+### 7.3. PDF Conversion (Chuyển đổi Tài liệu PDF) - Chi tiết
+
+Các script trong thư mục `scripts/` chịu trách nhiệm trích xuất cấu trúc (Hierarchical Extraction) từ các nguồn sách tham khảo PDF:
+
+| Tên Script (File) | Tài liệu Mục tiêu | Kỹ thuật Đặc biệt |
+| :--- | :--- | :--- |
+| `convert_history.py` | Bộ Lịch sử Việt Nam (15 Tập). | Phân cấp Chương > Bài > Mục. Loại bỏ Header/Footer rác. |
+| `convert_pdf_hcm.py` | Giáo trình Tư tưởng Hồ Chí Minh. | Trích xuất mục lục tự động (Regex Pattern). |
+| `convert_pdf_ktdl.py` | Giáo trình Kỹ thuật Đo lường. | **Formula Parsing:** Giữ nguyên chỉ số trên/dưới ($x^2, a_i$) để bảo toàn công thức toán học. |
 
 **Ví dụ chuyển đổi PDF Lịch sử Việt Nam:**
 ```bash
