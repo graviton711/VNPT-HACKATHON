@@ -350,7 +350,36 @@ docker run --gpus all --rm \
 **Kết quả:**
 Sau khi chạy xong, file `submission.csv` và `submission_time.csv` sẽ xuất hiện tại thư mục `/path/to/output_folder/` trên máy host.
 
-**Cách 2: Chạy tại cục bộ (Development Mode - Windows/Linux Manual)**
+---
+
+**Cách 2: Chạy qua inference.sh (Truyền tham số theo chuẩn BTC)**
+
+Nếu muốn sử dụng `inference.sh` làm entry-point theo đúng chuẩn Dockerfile của BTC:
+
+```bash
+docker run --gpus all --rm \
+  -v /path/to/private_test.json:/code/private_test.json \
+  -v /path/to/output_folder:/output \
+  -v /path/to/btc_keys.json:/code/api_keys/api-keys.json \
+  graviton711/submission-vnpt-final:latest \
+  bash inference.sh /code/private_test.json /output/submission.json
+```
+
+**Ví dụ cụ thể:**
+```bash
+docker run --gpus all --rm \
+  -v /home/btc/data/private_test_final.json:/code/private_test.json \
+  -v /home/btc/submission_results:/output \
+  -v /home/btc/keys/secret_keys.json:/code/api_keys/api-keys.json \
+  graviton711/submission-vnpt-final:latest \
+  bash inference.sh /code/private_test.json /output/submission.json
+```
+
+**Lưu ý:** Cách này sẽ truyền đường dẫn input/output trực tiếp vào script `inference.sh`, đảm bảo file đề thi của BTC được đọc đúng.
+
+---
+
+**Cách 3: Chạy tại cục bộ (Development Mode - Windows/Linux Manual)**
 ```bash
 # 1. Cài đặt thư viện
 pip install -r requirements.txt
