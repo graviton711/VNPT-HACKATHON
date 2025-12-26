@@ -1,6 +1,9 @@
 # VNPT AI Hackathon 2025: Báo Cáo Kỹ Thuật & Tài Liệu Hệ Thống
 
 **Đội thi:** Duel Warrior
+**Thành viên:** 
+      - Phan Đặng Thái Sơn (2007).
+      - Hoàng Chí Tâm (2007.
 **Phiên bản:** 1.0.0 (Submission v1)
 
 ## 1. Tổng quan Hệ thống (System Overview)
