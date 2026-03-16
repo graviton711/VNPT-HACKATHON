@@ -15,8 +15,6 @@ Hệ thống được thiết kế dựa trên kiến trúc **RAG (Retrieval-Aug
 
 Hệ thống hoạt động theo mô hình xử lý tuần tự (Sequential Pipeline) với sự hỗ trợ của các module chuyên biệt.
 
-### Sơ đồ Luồng hoạt động (Operational Flowchart)
-
 ### Sơ đồ Luồng hoạt động (Private Mode - High Performance)
 
 Trong chế độ **Private Mode**, hệ thống kích hoạt toàn bộ sức mạnh tính toán để xử lý sâu từng câu hỏi:
