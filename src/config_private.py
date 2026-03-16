@@ -15,7 +15,7 @@ RERANKER_MODEL = 'BAAI/bge-reranker-base'
 USE_RERANKER = True
 
 # Solver Settings
-MAX_RETRIES = 10000
+MAX_RETRIES = 10
 BATCH_SIZE_SMALL = 1  # Single Shot (Max Accuracy)
 BATCH_SIZE_LARGE = 1  # Single Shot (Max Accuracy)
 MAX_TOKENS_SMALL = 18000
@@ -42,7 +42,7 @@ RRF_K = 50
 RERANK_POOL_SIZE = 20   # Assess more candidates (Better GPU)
 
 # Concurrency & Batching Limits
-MAX_WORKERS_RAG = 4       # Reduced to fit Total 8
+MAX_WORKERS_RAG = 2     # Reduced to fit Total 8
 MAX_WORKERS_INFERENCE = 4 # Reduced to fit Total 8
 MAX_WORKERS_CALC = 8      # Sequential pass can use full 8
 RETRY_BATCH_TOKENS = 18000 

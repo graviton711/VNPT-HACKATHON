@@ -1,5 +1,5 @@
 # VNPT AI Hackathon 2025: Báo Cáo Kỹ Thuật & Tài Liệu Hệ Thống
-
+![alt text](image/image.png)
 **Đội thi:** Duel Warrior
 **Phiên bản:** 1.0.0 (Submission v1)
 

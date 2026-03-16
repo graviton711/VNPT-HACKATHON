@@ -3,7 +3,6 @@ import os
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .logger import setup_logger
-from .config import MAX_RETRIES
 
 logger = setup_logger(__name__)
 
@@ -14,13 +13,9 @@ class VNPTClient:
     """
     def __init__(self, key_file_path='api_keys/api-keys.json'):
         self.keys = self._load_keys(key_file_path)
-        # [MODIFIED] Allow override from Env Var for Mock Testing
-        self.api_root = os.getenv('VNPT_API_URL', "https://api.idg.vnpt.vn/data-service")
-        # Remove trailing slash if present
-        if self.api_root.endswith('/'): self.api_root = self.api_root[:-1]
-        
-        self.base_url = f"{self.api_root}/v1/chat/completions"
-        self.embedding_url = f"{self.api_root}/vnptai-hackathon-embedding"
+        # Allow environment variable overrides for testing
+        self.base_url = os.getenv("VNPT_CHAT_BASE_URL", "https://api.idg.vnpt.vn/data-service/v1/chat/completions")
+        self.embedding_url = os.getenv("VNPT_EMBED_BASE_URL", "https://api.idg.vnpt.vn/data-service/vnptai-hackathon-embedding")
         self.request_count = 0
 
     def get_request_count(self):
@@ -57,7 +52,7 @@ class VNPTClient:
             'Content-Type': 'application/json'
         }
 
-    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def chat_completion(self, messages, model='vnptai_hackathon_small', temperature=0.1, max_tokens=512, top_p=1.0, top_k=50, n=1, response_format=None, logprobs=False, tools=None, tool_choice=None, seed=None):
         self.request_count += 1
         if 'small' in model:
@@ -107,7 +102,7 @@ class VNPTClient:
              
         return message
 
-    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def get_embedding(self, text):
         self.request_count += 1
         key_type = 'embedding'
